@@ -51,6 +51,7 @@ class ViewLesson1 {
 			print(messageFalse)
 		}
 		
+		
 		// Дізнаємось скільки важить строки та числа
 		let number1Size = MemoryLayout.size(ofValue: number1)
 		let number2Size = MemoryLayout.size(ofValue: number2)
