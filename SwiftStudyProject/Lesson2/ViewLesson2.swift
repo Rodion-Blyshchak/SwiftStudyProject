@@ -31,20 +31,41 @@ class ViewLesson2 {
 	func studentAndClassResults() {
 		let listSubjects = ["Алгебра", "Геометрія", "Фізика", "Історія", "Українська мова", "Українська література", "Англійська мова"]
 		let listStudent = ["Антон", "Аліна", "Василь", "Вікторія", "Богдан", "Дарина", "Єгор", "Саша", "Женя", "Яна", "Максим", "Олена", "Олег", "Поліна", "Рома", "Софія", "Коля", "Маша", "Андрій", "Христина"]
+		
 		var resultOneStudent: [String: Int] = [:]
 		var dictionaryLearningOutcomes: [String: [String: Int]] = [:]
-		
-		for itemSubjects in listSubjects {
-			let randomAssessment = Int.random(in: 1...12)
-			resultOneStudent[itemSubjects] = randomAssessment
-		}
+		var dictionaryGradePointAverageStudents: [String: Int] = [:]
 		
 		for studentResults in listStudent {
+			
+			for itemSubjects in listSubjects {
+				let randomAssessment = Int.random(in: 1...12)
+				resultOneStudent[itemSubjects] = randomAssessment
+			}
+			
 			dictionaryLearningOutcomes[studentResults] = resultOneStudent
 		}
 		
-		print(dictionaryLearningOutcomes)
-
+		dictionaryLearningOutcomes.forEach { dictionaryItem in
+			print("\(dictionaryItem.key) та його/її оцінки - \(dictionaryItem.value)")
+		}
+		
+		for averageScore in dictionaryLearningOutcomes {
+			let sumPointsOneStudent = averageScore.value.values.reduce(0, +)
+			let averageScoreOneStudent = Double(sumPointsOneStudent)/Double(averageScore.value.values.count)
+			dictionaryGradePointAverageStudents[averageScore.key] = Int(averageScoreOneStudent.rounded())
+		}
+		
+		print("Середній бал учнів - \(dictionaryGradePointAverageStudents)")
+		
+		
+//		print(dictionaryLearningOutcomes)
+		
+		
+//		print("\(dictionaryLearningOutcomes.keys) - \(dictionaryLearningOutcomes.values)")
+		
+		
+		
 //		let dictionaryLearningOutcomes = ["1Учень - Антон": ["Алгебра": 10, "Геометрія": 11, "Фізика": 5, "Історія": 9, "Українська мова": 10, "Українська література": 10, "Англійська мова": 8],
 //										  "2Учень - Аліна": ["Алгебра": 4, "Геометрія": 4, "Фізика": 5, "Історія": 11, "Українська мова": 12, "Українська література": 10, "Англійська мова": 9],
 //										  "3Учень - Василь": ["Алгебра": 12, "Геометрія": 12, "Фізика": 12, "Історія": 6, "Українська мова": 7, "Українська література": 6, "Англійська мова": 8],
