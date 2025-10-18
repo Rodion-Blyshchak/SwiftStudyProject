@@ -32,11 +32,11 @@ class ViewLesson2 {
 		let listSubjects = ["Алгебра", "Геометрія", "Фізика", "Історія", "Українська мова", "Українська література", "Англійська мова"]
 		let listStudent = ["Антон", "Аліна", "Василь", "Вікторія", "Богдан", "Дарина", "Єгор", "Саша", "Женя", "Яна", "Максим", "Олена", "Олег", "Поліна", "Рома", "Софія", "Коля", "Маша", "Андрій", "Христина"]
 		
-		var resultOneStudent: [String: Int] = [:]
 		var dictionaryLearningOutcomes: [String: [String: Int]] = [:]
 		var dictionaryGradePointAverageStudents: [String: Int] = [:]
 		
 		for studentResults in listStudent {
+			var resultOneStudent: [String: Int] = [:]
 			
 			for itemSubjects in listSubjects {
 				let randomAssessment = Int.random(in: 1...12)
@@ -60,5 +60,25 @@ class ViewLesson2 {
 		
 		let classAverage = Double(dictionaryGradePointAverageStudents.values.reduce(0, +)) / Double(dictionaryGradePointAverageStudents.count)
 		print("Результати класу - \(Int(classAverage)) \(Int(classAverage) > 8 ? "Ще поживемо" : "Спробуємо ще наступного року")")
+		
+		
+		//==========================================================================================
+		
+
+		let fibonacciIndex = 0...20
+
+		func fibonacci(numberFibonacci: Int) -> Int {
+			if numberFibonacci == 0 {
+				return 0
+			} else if numberFibonacci == 1 {
+				return 1
+			}
+			
+			return fibonacci(numberFibonacci: numberFibonacci - 1) + fibonacci(numberFibonacci: numberFibonacci - 2)
+		}
+		
+		fibonacciIndex.forEach { number in
+			print(fibonacci(numberFibonacci: number))
+		}
 	}
 }
