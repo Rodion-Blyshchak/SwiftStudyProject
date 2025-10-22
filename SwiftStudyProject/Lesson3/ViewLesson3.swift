@@ -43,20 +43,20 @@
 class ViewLesson3 {
 	static let shared = ViewLesson3()
 	
-	let vehiclesList: [String] = [
-		"Toyota Camry",
-		"Honda Civic",
-		"Harley-Davidson Fat Boy",
-		"BMW X5",
-		"Kawasaki Ninja 400",
-		"Ford F-150",
-		"Ducati Panigale V4",
-		"Tesla Model 3",
-		"Yamaha MT-07",
-		"Mercedes C-Class"
+	let vehiclesList: [VehicleProtocol] = [
+		Car(brand: "Toyota", fuelType: .petrol),
+		  Car(brand: "BMW", fuelType: .diesel),
+		  Car(brand: "Audi", fuelType: .electric),
+		  Motorcycle(brand: "Honda", fuelType: .petrol),
+		  Motorcycle(brand: "Yamaha", fuelType: .diesel),
+		  Car(brand: "Ford", fuelType: .petrol),
+		  Car(brand: "Tesla", fuelType: .electric),
+		  Motorcycle(brand: "Kawasaki", fuelType: .petrol),
+		  Car(brand: "Mercedes", fuelType: .diesel),
+		  Motorcycle(brand: "Ducati", fuelType: .petrol)
 	]
 
 	func vehicleSimulation() {
-		print("Lesson 3")
+		
 	}
 }
