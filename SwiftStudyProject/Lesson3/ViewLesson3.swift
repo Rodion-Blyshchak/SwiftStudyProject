@@ -61,7 +61,7 @@ class ViewLesson3 {
 		let randomNumberVehicleSimulatorCalls = Int.random(in: 1...5)
 		var newVehiclesList: [VehicleProtocol] = []
 		
-		for _ in 0...randomNumberVehicleSimulatorCalls {
+		for _ in 1...randomNumberVehicleSimulatorCalls {
 			for itemVehicle in vehiclesList {
 				itemVehicle.drive(kilometers: Int.random(in: 0...500))
 				newVehiclesList.append(itemVehicle)
@@ -74,16 +74,26 @@ class ViewLesson3 {
 		let arrayMotorcycle: [VehicleProtocol] = newVehiclesList.filter {$0 is Motorcycle}
 		print("Кількість автомобілів - \(arrayCar.count)")
 		print("Кількість мотоциклів - \(arrayMotorcycle.count)")
+
+		print("Вжух-вжух на бензині - \(newVehiclesList.filter{$0.fuelType == .petrol}.count)шт")
+		print("Вжух-вжух на дизель - \(newVehiclesList.filter{$0.fuelType == .diesel}.count)шт")
+		print("Вжух-вжух на електриції - \(newVehiclesList.filter{$0.fuelType == .electric}.count)шт")
 		
-		for b in newVehiclesList {
-			switch b.fuelType {
-			case .petrol:
-				print("Кількість з бензином - \(arrayCar.filter{$0.fuelType == .petrol}.count)")
-			case .diesel:
-				print("Кількість з дізелем - \(arrayCar.filter{$0.fuelType == .diesel}.count)")
-			case .electric:
-				print("Кількість з електрикою - \(arrayCar.filter{$0.fuelType == .electric}.count)")
-			}
+		var vehiclesListMileage: [Int] = []
+		
+		for itemVehicle in newVehiclesList {
+			vehiclesListMileage.append(itemVehicle.mileage)
 		}
+		
+		var averageVehicleMileage = 0
+		
+		for itemMileage in vehiclesListMileage {
+			averageVehicleMileage += itemMileage
+		}
+		
+		averageVehicleMileage = averageVehicleMileage / vehiclesListMileage.count
+		
+		print("Середній пробіг - \(averageVehicleMileage)км")
+		
 	}
 }
