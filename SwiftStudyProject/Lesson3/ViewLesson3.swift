@@ -44,11 +44,11 @@ class ViewLesson3 {
 	static let shared = ViewLesson3()
 	
 	let vehiclesList: [VehicleProtocol] = [
-		Car(brand: "Toyota", fuelType: .petrol),
+		  Car(brand: "Toyota", fuelType: .petrol),
 		  Car(brand: "BMW", fuelType: .diesel),
 		  Car(brand: "Audi", fuelType: .electric),
 		  Motorcycle(brand: "Honda", fuelType: .petrol),
-		  Motorcycle(brand: "Yamaha", fuelType: .diesel),
+		  Motorcycle(brand: "Yamaha", fuelType: .electric),
 		  Car(brand: "Ford", fuelType: .petrol),
 		  Car(brand: "Tesla", fuelType: .electric),
 		  Motorcycle(brand: "Kawasaki", fuelType: .petrol),
@@ -56,7 +56,34 @@ class ViewLesson3 {
 		  Motorcycle(brand: "Ducati", fuelType: .petrol)
 	]
 
-	func vehicleSimulation() {
+	func vehicleSimulatorAndStatics() {
+		// VehicleSimulator
+		let randomNumberVehicleSimulatorCalls = Int.random(in: 1...5)
+		var newVehiclesList: [VehicleProtocol] = []
 		
+		for _ in 0...randomNumberVehicleSimulatorCalls {
+			for itemVehicle in vehiclesList {
+				itemVehicle.drive(kilometers: Int.random(in: 0...500))
+				newVehiclesList.append(itemVehicle)
+			}
+		}
+		
+		// Statics
+		print("Загальна кількість транспортних засобів - \(newVehiclesList.count)")
+		let arrayCar: [VehicleProtocol] = newVehiclesList.filter {$0 is Car}
+		let arrayMotorcycle: [VehicleProtocol] = newVehiclesList.filter {$0 is Motorcycle}
+		print("Кількість автомобілів - \(arrayCar.count)")
+		print("Кількість мотоциклів - \(arrayMotorcycle.count)")
+		
+		for b in newVehiclesList {
+			switch b.fuelType {
+			case .petrol:
+				print("Кількість з бензином - \(arrayCar.filter{$0.fuelType == .petrol}.count)")
+			case .diesel:
+				print("Кількість з дізелем - \(arrayCar.filter{$0.fuelType == .diesel}.count)")
+			case .electric:
+				print("Кількість з електрикою - \(arrayCar.filter{$0.fuelType == .electric}.count)")
+			}
+		}
 	}
 }

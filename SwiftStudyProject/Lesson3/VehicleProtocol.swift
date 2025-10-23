@@ -7,3 +7,9 @@ protocol VehicleProtocol {
 	
 	func drive (kilometers: Int)
 }
+//
+//extension VehicleProtocol {
+//	var mileage: Int {
+//		Int.random(in: 0...300)
+//	}
+//}

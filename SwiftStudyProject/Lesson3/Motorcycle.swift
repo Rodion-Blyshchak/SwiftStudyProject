@@ -4,7 +4,7 @@ class Motorcycle: VehicleProtocol {
 	var brand: String
 	var fuelType: FuelType
 	var numberWheels = 2
-	var mileage = 0
+		var mileage: Int = Int.random(in: 0...300)
 	
 	init(brand: String, fuelType: FuelType) {
 		self.brand = brand
@@ -12,7 +12,9 @@ class Motorcycle: VehicleProtocol {
 	}
 	
 	func drive(kilometers: Int) {
-		let sum = mileage + kilometers
+		mileage += kilometers
+		
+		print("Пробіг \(brand) - \(mileage)км")
 		
 		if fuelType == .petrol {
 			print("вжух, голосно пролітаю між заторів")
