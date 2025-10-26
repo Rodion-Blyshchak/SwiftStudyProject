@@ -61,11 +61,8 @@ class ViewLesson3 {
 		for item in vehiclesList {
 			for _ in 1...Int.random(in: 1...5) {
 				item.drive(kilometers: Int.random(in: 0...500))
-				vehiclesList.append(item)
 			}
 		}
-		
-		vehiclesList.removeSubrange(0...9)
 		
 		// Statics
 		print("Загальна кількість транспортних засобів - \(vehiclesList.count)")
