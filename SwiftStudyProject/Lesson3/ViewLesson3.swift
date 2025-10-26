@@ -59,14 +59,16 @@ class ViewLesson3 {
 	func vehicleSimulatorAndStatics() {
 		// VehicleSimulator
 		for item in vehiclesList {
-			for _ in 1...Int.random(in: 1...5){
+		   	for _ in 1...5{
 				item.drive(kilometers: Int.random(in: 0...500))
 				vehiclesList.append(item)
 			}
 		}
 		
+		vehiclesList.removeSubrange(0...9)
+		
 		// Statics
-		print("Загальна кількість транспортних засобів - \(vehiclesList.count - 10)") // -10 для вірної кількості
+		print("Загальна кількість транспортних засобів - \(vehiclesList.count)")
 		let arrayCar: [VehicleProtocol] = vehiclesList.filter {$0 is Car}
 		let arrayMotorcycle: [VehicleProtocol] = vehiclesList.filter {$0 is Motorcycle}
 		print("Кількість автомобілів - \(arrayCar.count)")
