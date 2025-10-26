@@ -59,7 +59,7 @@ class ViewLesson3 {
 	func vehicleSimulatorAndStatics() {
 		// VehicleSimulator
 		for item in vehiclesList {
-		   	for _ in 1...5{
+			for _ in 1...Int.random(in: 1...5) {
 				item.drive(kilometers: Int.random(in: 0...500))
 				vehiclesList.append(item)
 			}
