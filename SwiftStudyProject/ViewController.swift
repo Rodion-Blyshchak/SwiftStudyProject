@@ -13,7 +13,8 @@ class ViewController: UIViewController {
 		super.viewDidLoad()
 //		ViewLesson1.shared.getRandomValue()
 //		ViewLesson2.shared.studentAndClassResults()
-		ViewLesson3.shared.vehicleSimulatorAndStatics()
+//		ViewLesson3.shared.vehicleSimulatorAndStatics()
+		ViewLesson4.shared.start()
 	}
 
 
