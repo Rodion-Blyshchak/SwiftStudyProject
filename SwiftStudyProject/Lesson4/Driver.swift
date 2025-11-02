@@ -12,7 +12,8 @@ struct Driver {
 	var experience: Int
 	
 	func driveRandomly() {
-		let randomNumberKilometers = Int.random(in: 10...300) // У ТЗ сказано Double.random(in: 10...300)) но у drive(kilometers:) передаємо саме Int
+		let randomNumberKilometers = Int.random(in: 10...300)
+		
 		
 		if let currentVehicle = vehicle {
 			currentVehicle.drive(kilometers: randomNumberKilometers)
