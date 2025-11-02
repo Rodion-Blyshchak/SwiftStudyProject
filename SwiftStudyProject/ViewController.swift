@@ -15,6 +15,7 @@ class ViewController: UIViewController {
 //		ViewLesson2.shared.studentAndClassResults()
 //		ViewLesson3.shared.vehicleSimulatorAndStatics()
 		ViewLesson4.shared.start()
+		
 	}
 
 

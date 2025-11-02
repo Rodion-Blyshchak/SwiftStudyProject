@@ -43,7 +43,7 @@
 class ViewLesson3 {
 	static let shared = ViewLesson3()
 	
-	var vehiclesList: [VehicleProtocol] = [
+	let vehiclesList: [VehicleProtocol] = [
 		  Car(brand: "Toyota", fuelType: .petrol),
 		  Car(brand: "BMW", fuelType: .diesel),
 		  Car(brand: "Audi", fuelType: .electric),

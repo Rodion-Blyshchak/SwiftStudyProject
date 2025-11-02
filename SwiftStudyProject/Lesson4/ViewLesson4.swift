@@ -35,7 +35,7 @@ func assignVehicle(to driver: Driver, from availableVehicles: inout [Vehicle]) -
  • повертає оновленого водія
  5. Використай цю функцію для призначення транспорту всім водіям, у яких vehicle == nil.
  • Наприкінці виведи оновлений список усіх водіїв і їх транспортів.
- • Якщо транспорту не вистачило — виведи скільки людей залишилось без нього.
+ • Якщо транспорту не вистачило — виведи скільки людей залишилось без нього.   ++++
  6. Додай до Driver метод driveRandomly(), який:
  • генерує випадкову кількість кілометрів (наприклад, Double.random(in: 10...300))
  • якщо є транспорт — викликає drive(kilometers:) у нього
@@ -52,12 +52,95 @@ func assignVehicle(to driver: Driver, from availableVehicles: inout [Vehicle]) -
  ⁃ merge sort
 */
 
-// print("\n\n") - відступ у терміналі
+// print("\n") - відступ у терміналі
 
 class ViewLesson4 {
 	static let shared = ViewLesson4()
 	
 	func start() {
+		var vehiclesList: [VehicleProtocol] = [
+			  Car(brand: "Toyota", fuelType: .petrol),
+			  Car(brand: "BMW", fuelType: .diesel),
+			  Car(brand: "Audi", fuelType: .electric),
+			  Motorcycle(brand: "Honda", fuelType: .petrol),
+			  Motorcycle(brand: "Yamaha", fuelType: .electric),
+			  Car(brand: "Ford", fuelType: .petrol),
+			  Car(brand: "Tesla", fuelType: .electric),
+			  Motorcycle(brand: "Kawasaki", fuelType: .petrol),
+			  Car(brand: "Mercedes", fuelType: .diesel),
+			  Motorcycle(brand: "Ducati", fuelType: .petrol)
+		]
+
+		var arrayDrivers: [Driver] = [
+			Driver(name: "Denys", age: 23, vehicle: nil, experience: 2),
+			Driver(name: "Ihor", age: 30, vehicle: nil, experience: 8),
+			Driver(name: "Andriy", age: 27, vehicle: nil, experience: 0),
+			Driver(name: "Roman", age: 50, vehicle: nil, experience: 30),
+			Driver(name: "Ira", age: 43, vehicle: vehiclesList[4], experience: 19),
+			Driver(name: "Maksym", age: 20, vehicle: nil, experience: 1),
+			Driver(name: "Serhii", age: 38, vehicle: vehiclesList[3], experience: 13),
+			Driver(name: "Oleg", age: 27, vehicle: nil, experience: 4),
+			Driver(name: "Svitlana", age: 46, vehicle: nil, experience: 26),
+			Driver(name: "Yurii", age: 34, vehicle: nil, experience: 6),
+			Driver(name: "Ilya", age: 23, vehicle: nil, experience: 1),
+			Driver(name: "Slavik", age: 28, vehicle: nil, experience: 2),
+			Driver(name: "Vadim", age: 48, vehicle: vehiclesList[6], experience: 23),
+			Driver(name: "Ivan", age: 25, vehicle: nil, experience: 4),
+			Driver(name: "Pasha", age: 22, vehicle: nil, experience: 3)
+		]
 		
+		for driver in arrayDrivers {
+			if let vehicle = driver.vehicle {
+				print("\(driver.name) та його \(vehicle.brand)")
+			}
+		}
+		
+		let sortedArrayDrivesByExperience = arrayDrivers.sorted {$0.experience > $1.experience}
+		let sortedArrayDrivesByAge = arrayDrivers.sorted {$0.age < $1.age}
+		
+		print("\n")
+		for driver in sortedArrayDrivesByExperience {
+			print("\(driver.name) має \(driver.experience) років досвіду")
+		}
+		
+		print("\n")
+		for driver in sortedArrayDrivesByAge {
+			print("\(driver.name) має \(driver.age) років")
+		}
+		
+		func assignVehicle(to driver: Driver, from availableVehicles: inout [VehicleProtocol]) -> Driver {
+			guard driver.vehicle == nil, availableVehicles.count > 0 else {
+				return driver
+			}
+			
+			var updatedDriver = driver
+			
+			updatedDriver.vehicle = availableVehicles.first
+			availableVehicles.removeFirst(1)
+			
+			return updatedDriver
+		   }
+		
+		var numberUnitsWithoutTransport = 0
+		
+		for index in arrayDrivers.indices {
+			let currentDriver = arrayDrivers[index]
+			let updatedDriver = assignVehicle(to: currentDriver, from: &vehiclesList)
+			arrayDrivers[index] = updatedDriver
+			
+			let transportName = updatedDriver.vehicle?.brand ?? "ще не має("
+			if updatedDriver.vehicle?.brand == nil {
+				numberUnitsWithoutTransport += 1
+			}
+			print("Водій: \(updatedDriver.name), транспорт: \(transportName)")
+			
+		}
+		
+		print("ехх, не вистачило транспортних засобів для \(numberUnitsWithoutTransport) водіїв")
+		
+		print("\n")
+		arrayDrivers.forEach{msdasd in
+			msdasd.driveRandomly()
+		}
 	}
 }
