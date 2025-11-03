@@ -57,6 +57,19 @@ func assignVehicle(to driver: Driver, from availableVehicles: inout [Vehicle]) -
 class ViewLesson4 {
 	static let shared = ViewLesson4()
 	
+	private func assignVehicle(to driver: Driver, from availableVehicles: inout [VehicleProtocol]) -> Driver {
+		guard driver.vehicle == nil, availableVehicles.count > 0 else {
+			return driver
+		}
+		
+		var updatedDriver = driver
+	
+		updatedDriver.vehicle = availableVehicles.first
+		availableVehicles = Array(availableVehicles.dropFirst())
+
+		return updatedDriver
+	   }
+	
 	func start() {
 		var vehiclesList: [VehicleProtocol] = [
 			  Car(brand: "Toyota", fuelType: .petrol),
@@ -89,39 +102,23 @@ class ViewLesson4 {
 			Driver(name: "Pasha", age: 22, vehicle: nil, experience: 3)
 		]
 		
-		for driver in arrayDrivers {
-			if let vehicle = driver.vehicle {
-				print("\(driver.name) та його \(vehicle.brand)")
-			}
+		arrayDrivers.forEach {
+			guard let vehicle = $0.vehicle else {return}
+			print("\($0.name) та його \(vehicle.brand)")
 		}
 		
 		let sortedArrayDrivesByExperience = arrayDrivers.sorted {$0.experience > $1.experience}
 		let sortedArrayDrivesByAge = arrayDrivers.sorted {$0.age < $1.age}
 		
 		print("\n")
-		for driver in sortedArrayDrivesByExperience {
-			print("\(driver.name) має \(driver.experience) років досвіду")
+		sortedArrayDrivesByExperience.forEach {
+			print("\($0.name) має \($0.experience) років досвіду")
 		}
 		
 		print("\n")
-		for driver in sortedArrayDrivesByAge {
-			print("\(driver.name) має \(driver.age) років")
+		sortedArrayDrivesByAge.forEach {
+			print("\($0.name) має \($0.age) років")
 		}
-		
-		func assignVehicle(to driver: Driver, from availableVehicles: inout [VehicleProtocol]) -> Driver {
-			guard driver.vehicle == nil, availableVehicles.count > 0 else {
-				return driver
-			}
-			
-			var updatedDriver = driver
-			
-			updatedDriver.vehicle = availableVehicles.first
-			availableVehicles.removeFirst(1)
-			
-			return updatedDriver
-		   }
-		
-		var numberUnitsWithoutTransport = 0
 		
 		for index in arrayDrivers.indices {
 			let currentDriver = arrayDrivers[index]
@@ -129,18 +126,14 @@ class ViewLesson4 {
 			arrayDrivers[index] = updatedDriver
 			
 			let transportName = updatedDriver.vehicle?.brand ?? "ще не має("
-			if updatedDriver.vehicle?.brand == nil {
-				numberUnitsWithoutTransport += 1
-			}
 			print("Водій: \(updatedDriver.name), транспорт: \(transportName)")
 			
 		}
 		
+		let numberUnitsWithoutTransport = arrayDrivers.filter{$0.vehicle == nil}.count
 		print("ехх, не вистачило транспортних засобів для \(numberUnitsWithoutTransport) водіїв")
 		
 		print("\n")
-		arrayDrivers.forEach{msdasd in
-			msdasd.driveRandomly()
-		}
+		arrayDrivers.forEach {$0.driveRandomly()}
 	}
 }

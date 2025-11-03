@@ -14,11 +14,11 @@ struct Driver {
 	func driveRandomly() {
 		let randomNumberKilometers = Int.random(in: 10...300)
 		
-		
-		if let currentVehicle = vehicle {
-			currentVehicle.drive(kilometers: randomNumberKilometers)
-		} else {
+		guard let vehicle else {
 			print("\(name) тупцює ніжками, бо транспорту нема")
+			return
 		}
+		
+		vehicle.drive(kilometers: randomNumberKilometers)
 	}
 }
