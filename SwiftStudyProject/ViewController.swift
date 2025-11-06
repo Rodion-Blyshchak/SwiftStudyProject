@@ -8,14 +8,23 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-//		ViewLesson1.shared.getRandomValue()
-//		ViewLesson2.shared.studentAndClassResults()
-		ViewLesson3.shared.vehicleSimulatorAndStatics()
+		//		ViewLesson1.shared.getRandomValue()
+		//		ViewLesson2.shared.studentAndClassResults()
+		//		ViewLesson3.shared.vehicleSimulatorAndStatics()
 	}
-
-
+	
+	@IBAction func StoryboardViewController(_ sender: Any) {
+		let storyboard = UIStoryboard(name: "StoryboardViewController", bundle: nil )
+		let viewController = storyboard.instantiateViewController(identifier: "StoryboardViewController") as! StoryboardViewController
+		navigationController?.pushViewController(viewController, animated: true )
+	}
+	
+	@IBAction func ConstrainsViewController(_ sender: Any) {
+		let viewController = ConstraintsViewController()
+		navigationController?.pushViewController(viewController, animated: true)
+	}
+	
 }
-
