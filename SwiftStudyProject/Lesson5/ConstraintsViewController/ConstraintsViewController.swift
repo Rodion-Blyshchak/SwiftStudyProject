@@ -2,35 +2,103 @@
 //  ConstraintsViewController.swift
 //  SwiftStudyProject
 //
-//  Created by Rodion Blyshchak on 06.11.2025.
+//  Created by Rodion Blyshchak on 13.11.2025.
 //
 
 import UIKit
 
 class ConstraintsViewController: UIViewController {
-	var taskList: [String] = []
-	let newTaskInputView = NewTaskView.shared
-	let removeTaskInputView = ItemTask.shared
-	let taskListManager = TaskListStackView.shared
+	
+	private var imageDot: UIImageView = {
+	   var imageView = UIImageView()
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.heightAnchor.constraint(equalToConstant: 180).isActive = true
+		imageView.transform = CGAffineTransform(rotationAngle: .pi)
+		imageView.contentMode = .scaleAspectFill
+		imageView.image = .iconBackgroundDot
+		return imageView
+	}()
+	
+	private var imageWavyContour: UIImageView = {
+		let imageView = UIImageView()
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.heightAnchor.constraint(equalToConstant: 250).isActive = true
+		imageView.widthAnchor.constraint(equalToConstant: 250).isActive = true
+		imageView.contentMode = .scaleAspectFill
+		imageView.image = .iconBackgroundWavyContour
+		return imageView
+	}()
+	
+	private var imageIntertwine: UIImageView = {
+		let imageView = UIImageView()
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.heightAnchor.constraint(equalToConstant: 220).isActive = true
+		imageView.widthAnchor.constraint(equalToConstant: 220).isActive = true
+		imageView.transform = CGAffineTransform(rotationAngle: 145 * .pi / 180.0)
+		imageView.contentMode = .scaleAspectFill
+		imageView.image = .iconsBackgroundIntertwinesvg
+		return imageView
+	}()
+	
+	//==============================================
+	private var taskList: [String] = []
+	private var taskListView = TaskListStackView()
+	private var newTask = NewTaskInputView()
 	
 	override func viewDidLoad() {
+		super.viewDidLoad()
 		view.backgroundColor = .appWhite
-		AllImage.shared.imageDot(to: self.view, name: "IconBackgroundDot")
-		AllImage.shared.imageWavyContour(to: self.view, name: "IconBackgroundWavyContour")
-		AllImage.shared.imageIntertwine(to: self.view, name: "IconsBackgroundIntertwinesvg")
-		newTaskInputView.stackView(to: self.view, withPlaceholder: "New task")
-		newTaskInputView.addNewTaskButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
-		TaskListStackView.shared.taskListView(to: newTaskInputView)
-		taskListManager.taskListView(to: self.view)
+		view.addSubview(imageDot)
+		view.addSubview(imageWavyContour)
+		view.addSubview(imageIntertwine)
+		
+		NSLayoutConstraint.activate([
+			imageDot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			imageDot.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+		])
+		
+		NSLayoutConstraint.activate([
+			imageWavyContour.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 80),
+			imageWavyContour.topAnchor.constraint(equalTo: view.topAnchor, constant: 280)
+		])
+		
+		NSLayoutConstraint.activate([
+			imageIntertwine.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -60),
+			imageIntertwine.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -110)
+		])
+		
+		//==========================================
+		view.addSubview(taskListView)
+		view.addSubview(newTask)
+		newTask.translatesAutoresizingMaskIntoConstraints = false
+		newTask.placeholderTextField("New task")
+		newTask.addTaskButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
+		
+		NSLayoutConstraint.activate([
+			newTask.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			newTask.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			newTask.heightAnchor.constraint(equalToConstant: 60),
+			newTask.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+		])
+		
+		//==========================================
+		taskListView.translatesAutoresizingMaskIntoConstraints = false
+		
+		NSLayoutConstraint.activate([
+			taskListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			taskListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			taskListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+//			taskListView.bottomAnchor.constraint(equalTo: newTask.topAnchor, constant: -10)
+		])
+		
 		updateTaskListView()
 	}
 	
 	@objc func addTask() {
-		if let taskText = newTaskInputView.textFieldView.text, !taskText.isEmpty {
-			taskList.append(taskText)
+		if let task = newTask.textField.text, !task.isEmpty {
+			taskList.append(task)
 			updateTaskListView()
-			newTaskInputView.textFieldView.text = nil
-			print(taskList)
+			newTask.textField.text = nil
 		} else {
 			let alert = UIAlertController(title: "Уппс", message: "Текст не може бути порожнім!", preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -39,23 +107,22 @@ class ConstraintsViewController: UIViewController {
 	}
 	
 	@objc func removeTask(sender: UIButton) {
-			let indexToRemove = sender.tag
-			guard taskList.indices.contains(indexToRemove) else { return }
-			taskList.remove(at: indexToRemove)
-			updateTaskListView()
-		}
-
+		let indexToRemove = sender.tag
+		guard taskList.indices.contains(indexToRemove) else { return }
+		taskList.remove(at: indexToRemove)
+		updateTaskListView()
+	}
+	
 	func updateTaskListView() {
-			taskListManager.clearAllTasks()
+		taskListView.removeTask()
 		
-			for (index, task) in taskList.enumerated() {
-				guard let taskRow = ItemTask.shared.itemTaskView(textTask: task) else { continue }
-
-				if let trashButton = taskRow.arrangedSubviews.last as? UIButton {
-					trashButton.tag = index
-					trashButton.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
-				}
-				taskListManager.addTaskView(taskRow)
-			}
+		for (index, task) in taskList.enumerated() {
+			let taskRow = ItemTask()
+			taskRow.translatesAutoresizingMaskIntoConstraints = false
+			taskRow.configureTextTask(task)
+			taskRow.trashButton.tag = index
+			taskRow.trashButton.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
+			taskListView.addTask(taskRow)
 		}
+	}
 }

@@ -1,48 +1,77 @@
 //
-//  AllImage.swift
+//  ItemTask.swift
 //  SwiftStudyProject
 //
-//  Created by Rodion Blyshchak on 09.11.2025.
+//  Created by Rodion Blyshchak on 13.11.2025.
 //
 
 import UIKit
 
-class ItemTask {
-	static let shared = ItemTask()
-	
-	func itemTaskView(textTask: String) -> UIStackView? {
-		let checkboxButton = UIButton(type: .system)
+class ItemTask: UIView {
+	private var checkboxButton: UIButton = {
+		let checkbox = UIButton()
 		let uncheckedImage = UIImage(systemName: "square")
-		checkboxButton.setImage(uncheckedImage, for: .normal)
-		checkboxButton.tintColor = .appBlack
-		checkboxButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-		checkboxButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		checkbox.setImage(uncheckedImage, for: .normal)
+		checkbox.tintColor = .appBlack
+		checkbox.widthAnchor.constraint(equalToConstant: 30).isActive = true
+		checkbox.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		return checkbox
+	}()
+	
+	private var textTaskLabel: UILabel = {
+		let text = UILabel()
+		text.textColor = .appBlack
+		text.font = .systemFont(ofSize: 20, weight: .medium)
+		text.numberOfLines = 2
+		return text
+	}()
+	
+	lazy var trashButton: UIButton = {
+		let button = UIButton()
+		let imageButton = UIImage(systemName: "trash")
+		button.setImage(imageButton, for: .normal)
+		button.tintColor = .appRed
+		button.widthAnchor.constraint(equalToConstant: 30).isActive = true
+		button.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		return button
+	}()
+	
+	private var staskView: UIStackView = {
+		let view = UIStackView()
+		view.translatesAutoresizingMaskIntoConstraints = false
+		view.axis = .horizontal
+		view.alignment = .center
+		view.distribution = .fill
+		view.spacing = 10
+		view.isLayoutMarginsRelativeArrangement = true
+		view.layoutMargins = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
+		return view
+	}()
+	
+	override init(frame: CGRect) {
+		super.init(frame: frame)
+		setupView()
+	}
+	
+	required init?(coder: NSCoder) {
+		fatalError("init(coder:) has not been implemented")
+	}
+	
+	private func setupView() {
+		addSubview(staskView)
+		staskView.addArrangedSubview(checkboxButton)
+		staskView.addArrangedSubview(textTaskLabel)
+		staskView.addArrangedSubview(trashButton)
 		
-		let textTaskLabel = UILabel()
-		textTaskLabel.text = textTask
-		textTaskLabel.textColor = .appBlack
-		textTaskLabel.font = .systemFont(ofSize: 20, weight: .medium)
-		textTaskLabel.numberOfLines = 2
-		
-		let trashButton = UIButton()
-		let trasgImage = UIImage(systemName: "trash")
-		trashButton.setImage(trasgImage, for: .normal)
-		trashButton.tintColor = .appRed
-		trashButton.widthAnchor.constraint(equalToConstant: 30).isActive = true
-		trashButton.heightAnchor.constraint(equalToConstant: 30).isActive = true
-		
-		let taskStack = UIStackView()
-		taskStack.translatesAutoresizingMaskIntoConstraints = false
-		taskStack.axis = .horizontal
-		taskStack.alignment = .center
-		taskStack.distribution = .fill
-		taskStack.spacing = 10
-		taskStack.isLayoutMarginsRelativeArrangement = true
-		taskStack.layoutMargins = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
-		taskStack.addArrangedSubview(checkboxButton)
-		taskStack.addArrangedSubview(textTaskLabel)
-		taskStack.addArrangedSubview(trashButton)
-		
-		return taskStack
+		NSLayoutConstraint.activate([
+			staskView.topAnchor.constraint(equalTo: self.topAnchor),
+			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+			staskView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+			staskView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+		])
+	}
+	
+	func configureTextTask(_ text: String) {
+		textTaskLabel.text = text
 	}
 }
