@@ -8,7 +8,7 @@
 import UIKit
 
 class NewTaskInputView: UIView {
-	lazy var textField: UITextField = {
+	private var textField: UITextField = {
 		let input = UITextField()
 		input.backgroundColor = .appGrey
 		input.textColor = .appBlack
@@ -17,7 +17,7 @@ class NewTaskInputView: UIView {
 		return input
 	}()
 	
-	lazy var addTaskButton: UIButton = {
+	private var addTaskButton: UIButton = {
 		let button = UIButton()
 		let buttonImage = UIImage(named: "ArrowTop")
 		button.setImage(buttonImage, for: .normal)
@@ -40,14 +40,14 @@ class NewTaskInputView: UIView {
 	
 	override init(frame: CGRect) {
 		super .init(frame: frame)
-		setupkView()
+		setupView()
 	}
 	
 	required init?(coder: NSCoder) {
 		fatalError("init(coder:) has not been implemented")
 	}
 	
-	private func setupkView() {
+	private func setupView() {
 		addSubview(staskView)
 		staskView.addArrangedSubview(textField)
 		staskView.addArrangedSubview(addTaskButton)
@@ -61,4 +61,9 @@ class NewTaskInputView: UIView {
 	func placeholderTextField (_ placeholder: String) {
 		textField.placeholder = placeholder
 	}
+	
+	func setUpdateTextField(text: String?) {textField.text = text} //setter
+	var getTextField: String? {textField.text} // getter
+	
+	var getAddTaskButton: UIButton {addTaskButton}
 }

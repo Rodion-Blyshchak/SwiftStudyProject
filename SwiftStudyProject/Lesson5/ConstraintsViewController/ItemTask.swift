@@ -26,7 +26,7 @@ class ItemTask: UIView {
 		return text
 	}()
 	
-	lazy var trashButton: UIButton = {
+	private var trashButton: UIButton = {
 		let button = UIButton()
 		let imageButton = UIImage(systemName: "trash")
 		button.setImage(imageButton, for: .normal)
@@ -74,4 +74,7 @@ class ItemTask: UIView {
 	func configureTextTask(_ text: String) {
 		textTaskLabel.text = text
 	}
+	
+	func setUpdateTrashButton(tag: Int) {trashButton.tag = tag}
+	var getTrashButton: UIButton {trashButton}
 }

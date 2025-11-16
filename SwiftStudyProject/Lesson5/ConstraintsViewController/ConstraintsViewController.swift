@@ -48,40 +48,46 @@ class ConstraintsViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
+	
+		setupTopImageDot()
+		setupAverageImageContour()
+		setupBottomImageIntertwine()
+		
+		tasks()
+		inputNewTask()
+
+		updateTaskListView()
+	}
+	
+	private func setupTopImageDot() {
 		view.addSubview(imageDot)
-		view.addSubview(imageWavyContour)
-		view.addSubview(imageIntertwine)
 		
 		NSLayoutConstraint.activate([
 			imageDot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			imageDot.trailingAnchor.constraint(equalTo: view.trailingAnchor)
 		])
+	}
+	
+	private func setupAverageImageContour() {
+		view.addSubview(imageWavyContour)
 		
 		NSLayoutConstraint.activate([
 			imageWavyContour.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 80),
 			imageWavyContour.topAnchor.constraint(equalTo: view.topAnchor, constant: 280)
 		])
+	}
+	
+	private func setupBottomImageIntertwine() {
+		view.addSubview(imageIntertwine)
 		
 		NSLayoutConstraint.activate([
 			imageIntertwine.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -60),
 			imageIntertwine.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -110)
 		])
-		
-		//==========================================
+	}
+	
+	private func tasks() {
 		view.addSubview(taskListView)
-		view.addSubview(newTask)
-		newTask.translatesAutoresizingMaskIntoConstraints = false
-		newTask.placeholderTextField("New task")
-		newTask.addTaskButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
-		
-		NSLayoutConstraint.activate([
-			newTask.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			newTask.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			newTask.heightAnchor.constraint(equalToConstant: 60),
-			newTask.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-		])
-		
-		//==========================================
 		taskListView.translatesAutoresizingMaskIntoConstraints = false
 		
 		NSLayoutConstraint.activate([
@@ -90,15 +96,29 @@ class ConstraintsViewController: UIViewController {
 			taskListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
 //			taskListView.bottomAnchor.constraint(equalTo: newTask.topAnchor, constant: -10)
 		])
-		
-		updateTaskListView()
 	}
 	
+	private func inputNewTask() {
+		view.addSubview(newTask)
+		newTask.translatesAutoresizingMaskIntoConstraints = false
+		newTask.placeholderTextField("New task")
+		newTask.getAddTaskButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
+		
+		NSLayoutConstraint.activate([
+			newTask.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			newTask.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			newTask.heightAnchor.constraint(equalToConstant: 60),
+			newTask.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+		])
+	}
+	
+	//==============================================
+	
 	@objc func addTask() {
-		if let task = newTask.textField.text, !task.isEmpty {
+		if let task = newTask.getTextField, !task.isEmpty {
 			taskList.append(task)
 			updateTaskListView()
-			newTask.textField.text = nil
+			newTask.setUpdateTextField(text: nil)
 		} else {
 			let alert = UIAlertController(title: "Уппс", message: "Текст не може бути порожнім!", preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -120,8 +140,8 @@ class ConstraintsViewController: UIViewController {
 			let taskRow = ItemTask()
 			taskRow.translatesAutoresizingMaskIntoConstraints = false
 			taskRow.configureTextTask(task)
-			taskRow.trashButton.tag = index
-			taskRow.trashButton.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
+			taskRow.setUpdateTrashButton(tag: index)
+			taskRow.getTrashButton.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
 			taskListView.addTask(taskRow)
 		}
 	}
