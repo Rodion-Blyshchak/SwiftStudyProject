@@ -39,6 +39,6 @@ class TaskListStackView: UIView {
 	}
 	
 	func removeTask() {
-		staskView.arrangedSubviews.forEach {$0.removeFromSuperview()}
+		staskView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 	}
 }

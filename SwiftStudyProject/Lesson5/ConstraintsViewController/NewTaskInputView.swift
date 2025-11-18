@@ -25,6 +25,7 @@ class NewTaskInputView: UIView {
 		button.heightAnchor.constraint(equalToConstant: 40).isActive = true
 		button.layer.cornerRadius = 20
 		button.backgroundColor = .appBlue
+        button.addTarget(NewTaskInputView.self, action: #selector(addTask), for: .touchUpInside)
 		return button
 	}()
 	
@@ -62,8 +63,17 @@ class NewTaskInputView: UIView {
 		textField.placeholder = placeholder
 	}
 	
-	func setUpdateTextField(text: String?) {textField.text = text} //setter
-	var getTextField: String? {textField.text} // getter
-	
-	var getAddTaskButton: UIButton {addTaskButton}
+    func setTextField(with text: String?) {
+        textField.text = text
+    }
+    
+    var textFieldText: String? {
+        textField.text
+    }
+    
+    var addTaskButtonAction: (() -> Void)?
+    
+    @objc func addTask() {
+        addTaskButtonAction?()
+    }
 }
