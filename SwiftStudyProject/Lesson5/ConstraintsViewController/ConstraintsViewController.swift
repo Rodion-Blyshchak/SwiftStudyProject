@@ -49,44 +49,29 @@ class ConstraintsViewController: UIViewController {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 	
-		setupTopImageDot()
-		setupAverageImageContour()
-		setupBottomImageIntertwine()
-		
-		tasks()
+		setupTopImage()
+		setupTasks()
 		inputNewTask()
 
 		updateTaskListView()
 	}
 	
-	private func setupTopImageDot() {
+	private func setupTopImage() {
 		view.addSubview(imageDot)
-		
-		NSLayoutConstraint.activate([
-			imageDot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			imageDot.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-		])
-	}
-	
-	private func setupAverageImageContour() {
 		view.addSubview(imageWavyContour)
-		
-		NSLayoutConstraint.activate([
-			imageWavyContour.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 80),
-			imageWavyContour.topAnchor.constraint(equalTo: view.topAnchor, constant: 280)
-		])
-	}
-	
-	private func setupBottomImageIntertwine() {
 		view.addSubview(imageIntertwine)
 		
 		NSLayoutConstraint.activate([
+			imageDot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			imageDot.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			imageWavyContour.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 80),
+			imageWavyContour.topAnchor.constraint(equalTo: view.topAnchor, constant: 280),
 			imageIntertwine.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -60),
 			imageIntertwine.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -110)
 		])
 	}
 	
-	private func tasks() {
+	private func setupTasks() {
 		view.addSubview(taskListView)
 		taskListView.translatesAutoresizingMaskIntoConstraints = false
 		
