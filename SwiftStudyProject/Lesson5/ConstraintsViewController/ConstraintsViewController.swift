@@ -8,102 +8,89 @@
 import UIKit
 
 class ConstraintsViewController: UIViewController {
+	enum ConstantsSize {
+		static let imageHeightAnchor: CGFloat = 200
+		static let imageWidthAnchor: CGFloat = 250
+	}
 	
-	private var imageDot: UIImageView = {
-	   var imageView = UIImageView()
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.heightAnchor.constraint(equalToConstant: 180).isActive = true
-		imageView.transform = CGAffineTransform(rotationAngle: .pi)
-		imageView.contentMode = .scaleAspectFill
-		imageView.image = .iconBackgroundDot
-		return imageView
-	}()
-	
-	private var imageWavyContour: UIImageView = {
-		let imageView = UIImageView()
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.heightAnchor.constraint(equalToConstant: 250).isActive = true
-		imageView.widthAnchor.constraint(equalToConstant: 250).isActive = true
-		imageView.contentMode = .scaleAspectFill
-		imageView.image = .iconBackgroundWavyContour
-		return imageView
-	}()
-	
-	private var imageIntertwine: UIImageView = {
-		let imageView = UIImageView()
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.heightAnchor.constraint(equalToConstant: 220).isActive = true
-		imageView.widthAnchor.constraint(equalToConstant: 220).isActive = true
-		imageView.transform = CGAffineTransform(rotationAngle: 145 * .pi / 180.0)
-		imageView.contentMode = .scaleAspectFill
-		imageView.image = .iconsBackgroundIntertwinesvg
-		return imageView
-	}()
-	
-	//==============================================
-	private var taskList: [String] = []
+	private var newTaskView = NewTaskInputView()
 	private var taskListView = TaskListStackView()
-	private var newTask = NewTaskInputView()
+	private var taskList: [String] = []
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
-	
-		setupTopImage()
-		setupTasks()
-		inputNewTask()
-
+		setupBackgroundImage()
+		setupNewTaskInputView()
+		setupTaskListStackView()
 		updateTaskListView()
 	}
 	
-	private func setupTopImage() {
+	// MARK: - backgroundImage
+	private func setupBackgroundImage() {
+		let imageDot = UIImageView()
+		imageDot.translatesAutoresizingMaskIntoConstraints = false
+		imageDot.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		imageDot.transform = CGAffineTransform(rotationAngle: .pi)
+		imageDot.contentMode = .scaleAspectFill
+		imageDot.image = .iconBackgroundDot
 		view.addSubview(imageDot)
-		view.addSubview(imageWavyContour)
-		view.addSubview(imageIntertwine)
 		
 		NSLayoutConstraint.activate([
 			imageDot.leadingAnchor.constraint(equalTo: view.leadingAnchor),
 			imageDot.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+		])
+		
+		let imageWavyContour = UIImageView()
+		imageWavyContour.translatesAutoresizingMaskIntoConstraints = false
+		imageWavyContour.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		imageWavyContour.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
+		imageWavyContour.contentMode = .scaleAspectFill
+		imageWavyContour.image = .iconBackgroundWavyContour
+		view.addSubview(imageWavyContour)
+		
+		NSLayoutConstraint.activate([
 			imageWavyContour.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 80),
 			imageWavyContour.topAnchor.constraint(equalTo: view.topAnchor, constant: 280),
+		])
+		
+		let imageIntertwine = UIImageView()
+		imageIntertwine.translatesAutoresizingMaskIntoConstraints = false
+		imageIntertwine.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		imageIntertwine.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
+		imageIntertwine.transform = CGAffineTransform(rotationAngle: 145 * .pi / 180.0)
+		imageIntertwine.contentMode = .scaleAspectFill
+		imageIntertwine.image = .iconsBackgroundIntertwinesvg
+		view.addSubview(imageIntertwine)
+		
+		NSLayoutConstraint.activate([
 			imageIntertwine.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: -60),
 			imageIntertwine.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -110)
 		])
 	}
 	
-	private func setupTasks() {
-		view.addSubview(taskListView)
-		taskListView.translatesAutoresizingMaskIntoConstraints = false
-		
-		NSLayoutConstraint.activate([
-			taskListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			taskListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			taskListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-//			taskListView.bottomAnchor.constraint(equalTo: newTask.topAnchor, constant: -10)
-		])
-	}
+	//MARK: - inputNewTask
+	private func setupNewTaskInputView() {
+			view.addSubview(newTaskView)
+			newTaskView.translatesAutoresizingMaskIntoConstraints = false
+			newTaskView.placeholderTextField(with: "New task")
+			newTaskView.addTaskButtonAction = {
+			self.handleAddTaskAction()
+			}
+			
+			NSLayoutConstraint.activate([
+				newTaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+				newTaskView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+				newTaskView.heightAnchor.constraint(equalToConstant: 60),
+				newTaskView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+			])
+		}
 	
-	private func inputNewTask() {
-		view.addSubview(newTask)
-		newTask.translatesAutoresizingMaskIntoConstraints = false
-		newTask.placeholderTextField("New task")
-		newTask.getAddTaskButton.addTarget(self, action: #selector(addTask), for: .touchUpInside)
-		
-		NSLayoutConstraint.activate([
-			newTask.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			newTask.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			newTask.heightAnchor.constraint(equalToConstant: 60),
-			newTask.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-		])
-	}
-	
-	//==============================================
-	
-	@objc func addTask() {
-		if let task = newTask.getTextField, !task.isEmpty {
-			taskList.append(task)
-			updateTaskListView()
-			newTask.setUpdateTextField(text: nil)
+	private func handleAddTaskAction() {
+		if let task = self.newTaskView.textFieldVaule, !task.isEmpty {
+			self.taskList.append(task)
+			self.updateTaskListView()
+			self.newTaskView.setTextField(with: nil)
 		} else {
 			let alert = UIAlertController(title: "Уппс", message: "Текст не може бути порожнім!", preferredStyle: .alert)
 			alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -111,23 +98,36 @@ class ConstraintsViewController: UIViewController {
 		}
 	}
 	
-	@objc func removeTask(sender: UIButton) {
-		let indexToRemove = sender.tag
-		guard taskList.indices.contains(indexToRemove) else { return }
-		taskList.remove(at: indexToRemove)
+	//MARK: - taskListView
+	private func setupTaskListStackView() {
+		view.addSubview(taskListView)
+		taskListView.translatesAutoresizingMaskIntoConstraints = false
+			
+		NSLayoutConstraint.activate([
+			taskListView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			taskListView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			taskListView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+		])
+	}
+	
+	@objc func removeTask(at index: Int) {
+		guard taskList.indices.contains(index) else { return }
+		taskList.remove(at: index)
 		updateTaskListView()
 	}
 	
 	func updateTaskListView() {
-		taskListView.removeTask()
+		taskListView.removeTaskView()
 		
 		for (index, task) in taskList.enumerated() {
 			let taskRow = ItemTask()
 			taskRow.translatesAutoresizingMaskIntoConstraints = false
-			taskRow.configureTextTask(task)
+			taskRow.configureTextTask(with: task)
 			taskRow.setUpdateTrashButton(tag: index)
-			taskRow.getTrashButton.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
-			taskListView.addTask(taskRow)
+			taskRow.removeTaskButtonAction = {
+				self.removeTask(at: index)
+			}
+			taskListView.addTaskView(taskRow)
 		}
 	}
 }

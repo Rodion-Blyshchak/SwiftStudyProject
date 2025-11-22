@@ -8,23 +8,33 @@
 import UIKit
 
 class NewTaskInputView: UIView {
+	enum ConstantsSize {
+		static let cornerRadius: CGFloat = 16
+		static let heightAnchor: CGFloat = 40
+		static let widthAnchor: CGFloat = 40
+		static let spacingElements: CGFloat = 10
+		static let leadingAnchor: CGFloat = 20
+		static let trailingAnchor: CGFloat = -20
+	}
+	
 	private var textField: UITextField = {
 		let input = UITextField()
 		input.backgroundColor = .appGrey
 		input.textColor = .appBlack
-		input.layer.cornerRadius = 16
-		input.heightAnchor.constraint(equalToConstant: 40).isActive = true
+		input.layer.cornerRadius = ConstantsSize.cornerRadius
+		input.heightAnchor.constraint(equalToConstant: ConstantsSize.heightAnchor).isActive = true
 		return input
 	}()
 	
-	private var addTaskButton: UIButton = {
+	private lazy var addTaskButton: UIButton = {
 		let button = UIButton()
 		let buttonImage = UIImage(named: "ArrowTop")
 		button.setImage(buttonImage, for: .normal)
-		button.widthAnchor.constraint(equalToConstant: 40).isActive = true
-		button.heightAnchor.constraint(equalToConstant: 40).isActive = true
-		button.layer.cornerRadius = 20
+		button.widthAnchor.constraint(equalToConstant: ConstantsSize.widthAnchor).isActive = true
+		button.heightAnchor.constraint(equalToConstant: ConstantsSize.heightAnchor).isActive = true
+		button.layer.cornerRadius = ConstantsSize.cornerRadius
 		button.backgroundColor = .appBlue
+		button.addTarget(self, action: #selector(addTask), for: .touchUpInside)
 		return button
 	}()
 	
@@ -34,7 +44,7 @@ class NewTaskInputView: UIView {
 		view.axis = .horizontal
 		view.alignment = .fill
 		view.distribution = .fill
-		view.spacing = 10
+		view.spacing = ConstantsSize.spacingElements
 		return view
 	}()
 	
@@ -53,17 +63,26 @@ class NewTaskInputView: UIView {
 		staskView.addArrangedSubview(addTaskButton)
 		
 		NSLayoutConstraint.activate([
-			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 20),
-			staskView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20),
+			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: ConstantsSize.leadingAnchor),
+			staskView.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: ConstantsSize.trailingAnchor),
 		])
 	}
 	
-	func placeholderTextField (_ placeholder: String) {
+	func placeholderTextField (with placeholder: String) {
 		textField.placeholder = placeholder
 	}
 	
-	func setUpdateTextField(text: String?) {textField.text = text} //setter
-	var getTextField: String? {textField.text} // getter
+	func setTextField(with text: String?) {
+		textField.text = text
+	}
 	
-	var getAddTaskButton: UIButton {addTaskButton}
+	var textFieldVaule: String? {
+		textField.text
+	}
+	
+	var addTaskButtonAction: (() -> Void)?
+	
+	@objc func addTask() {
+		addTaskButtonAction?()
+	}
 }

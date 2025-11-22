@@ -8,31 +8,39 @@
 import UIKit
 
 class ItemTask: UIView {
+	enum ConstantsSize {
+		static let heightAnchor: CGFloat = 30
+		static let widthAnchor: CGFloat = 30
+		static let spacingElements: CGFloat = 10
+		static let sizeFont: CGFloat = 20
+	}
+	
 	private var checkboxButton: UIButton = {
 		let checkbox = UIButton()
 		let uncheckedImage = UIImage(systemName: "square")
 		checkbox.setImage(uncheckedImage, for: .normal)
 		checkbox.tintColor = .appBlack
-		checkbox.widthAnchor.constraint(equalToConstant: 30).isActive = true
-		checkbox.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		checkbox.widthAnchor.constraint(equalToConstant: ConstantsSize.widthAnchor).isActive = true
+		checkbox.heightAnchor.constraint(equalToConstant: ConstantsSize.spacingElements).isActive = true
 		return checkbox
 	}()
 	
 	private var textTaskLabel: UILabel = {
 		let text = UILabel()
 		text.textColor = .appBlack
-		text.font = .systemFont(ofSize: 20, weight: .medium)
+		text.font = .systemFont(ofSize: ConstantsSize.sizeFont, weight: .medium)
 		text.numberOfLines = 2
 		return text
 	}()
 	
-	private var trashButton: UIButton = {
+	private lazy var trashButton: UIButton = {
 		let button = UIButton()
 		let imageButton = UIImage(systemName: "trash")
 		button.setImage(imageButton, for: .normal)
 		button.tintColor = .appRed
-		button.widthAnchor.constraint(equalToConstant: 30).isActive = true
-		button.heightAnchor.constraint(equalToConstant: 30).isActive = true
+		button.widthAnchor.constraint(equalToConstant: ConstantsSize.widthAnchor).isActive = true
+		button.heightAnchor.constraint(equalToConstant: ConstantsSize.heightAnchor).isActive = true
+		button.addTarget(self, action: #selector(removeTask), for: .touchUpInside)
 		return button
 	}()
 	
@@ -42,7 +50,7 @@ class ItemTask: UIView {
 		view.axis = .horizontal
 		view.alignment = .center
 		view.distribution = .fill
-		view.spacing = 10
+		view.spacing = ConstantsSize.spacingElements
 		view.isLayoutMarginsRelativeArrangement = true
 		view.layoutMargins = UIEdgeInsets(top: 5, left: 20, bottom: 5, right: 20)
 		return view
@@ -71,10 +79,17 @@ class ItemTask: UIView {
 		])
 	}
 	
-	func configureTextTask(_ text: String) {
+	func configureTextTask(with text: String) {
 		textTaskLabel.text = text
 	}
 	
-	func setUpdateTrashButton(tag: Int) {trashButton.tag = tag}
-	var getTrashButton: UIButton {trashButton}
+	func setUpdateTrashButton(tag: Int) {
+		trashButton.tag = tag
+	}
+	
+	var removeTaskButtonAction: (() -> Void)?
+	
+	@objc func removeTask() {
+		removeTaskButtonAction?()
+	}
 }
