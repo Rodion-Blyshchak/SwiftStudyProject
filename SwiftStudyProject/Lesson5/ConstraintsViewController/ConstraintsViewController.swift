@@ -116,11 +116,11 @@ class ConstraintsViewController: UIViewController {
 		updateTaskListView()
 	}
 	
-	func updateTaskListView() {
+	private func updateTaskListView() {
 		taskListView.removeTaskView()
 		
 		for (index, task) in taskList.enumerated() {
-			let taskRow = ItemTask()
+			let taskRow = ItemTaskView()
 			taskRow.translatesAutoresizingMaskIntoConstraints = false
 			taskRow.configureTextTask(with: task)
 			taskRow.setUpdateTrashButton(tag: index)

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="ItemTaskStoryboardView" customModule="SwiftStudyProject" customModuleProvider="target">
+            <connections>
+                <outlet property="LabelOutlet" destination="X7T-MJ-aL6" id="p1r-1r-YAK"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="361" height="100"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="X7T-MJ-aL6">
+                    <rect key="frame" x="0.0" y="39.666666666666664" width="42" height="21"/>
+                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                    <nil key="textColor"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="EXm-Th-LIY">
+                    <rect key="frame" x="294.66666666666669" y="32.666666666666664" width="66.333333333333314" height="34.999999999999993"/>
+                    <color key="tintColor" name="appRed"/>
+                    <state key="normal" title="Button"/>
+                    <buttonConfiguration key="configuration" style="plain" title="Trash"/>
+                    <connections>
+                        <action selector="removeTaskViewAction:" destination="-1" eventType="touchUpInside" id="zZx-Hp-MwB"/>
+                    </connections>
+                </button>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <constraints>
+                <constraint firstItem="X7T-MJ-aL6" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="1xn-I9-fB9"/>
+                <constraint firstItem="EXm-Th-LIY" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="4V4-YN-46A"/>
+                <constraint firstAttribute="trailing" secondItem="EXm-Th-LIY" secondAttribute="trailing" id="9Pd-mC-Fir"/>
+                <constraint firstItem="X7T-MJ-aL6" firstAttribute="centerY" secondItem="iN0-l3-epB" secondAttribute="centerY" id="AyC-aE-Auz"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="283.96946564885496" y="307.04225352112678"/>
+        </view>
+    </objects>
+    <resources>
+        <namedColor name="appRed">
+            <color red="0.96899998188018799" green="0.090000003576278687" blue="0.090000003576278687" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

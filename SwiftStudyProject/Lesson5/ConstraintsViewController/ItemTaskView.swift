@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ItemTask: UIView {
+class ItemTaskView: UIView {
 	enum ConstantsSize {
 		static let heightAnchor: CGFloat = 30
 		static let widthAnchor: CGFloat = 30
