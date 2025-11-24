@@ -1,0 +1,66 @@
+# ======================================
+# Xcode & Swift – Clean gitignore
+# ======================================
+
+### User-specific Xcode files
+xcuserdata/
+*.xcuserstate
+*.xcuserdatad
+**/xcuserdata/
+**/*.xcuserstate
+
+### Xcode Project/Workspace
+*.xcworkspace/xcuserdata/
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+
+### Derived data & builds
+DerivedData/
+build/
+*.build/
+
+### Old Xcode files
+*.moved-aside
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+
+### Swift / Obj-C
+*.hmap
+
+### Archives & packaging
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+### Playgrounds
+timeline.xctimeline
+playground.xcworkspace
+
+### Swift Package Manager
+.build/
+# .swiftpm/
+# Package.resolved
+
+### CocoaPods (uncomment if needed)
+# Pods/
+# *.xcworkspace
+
+### Carthage
+Carthage/Build/
+
+### Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/**/*.png
+fastlane/test_output
+
+### Code Injection
+iOSInjectionProject/
+
+# END
