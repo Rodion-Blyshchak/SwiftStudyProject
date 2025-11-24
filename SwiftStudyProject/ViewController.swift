@@ -11,9 +11,12 @@ class ViewController: UIViewController {
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
-		//		ViewLesson1.shared.getRandomValue()
-		//		ViewLesson2.shared.studentAndClassResults()
-		//		ViewLesson3.shared.vehicleSimulatorAndStatics()
+
+		//	ViewLesson1.shared.getRandomValue()
+		//	ViewLesson2.shared.studentAndClassResults()
+		//	ViewLesson3.shared.vehicleSimulatorAndStatics()
+		ViewLesson4.shared.start()
+
 	}
 	
 	@IBAction func StoryboardViewController(_ sender: Any) {
