@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24412" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24405"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Storyboard View Controller-->
+        <scene sceneID="s0d-6b-0kx">
+            <objects>
+                <viewController storyboardIdentifier="StoryboardViewController" id="Y6W-OH-hqX" customClass="StoryboardViewController" customModule="SwiftStudyProject" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="5EZ-qb-Rvc">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="IconBackgroundDot" translatesAutoresizingMaskIntoConstraints="NO" id="MCa-Zi-3Ke">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="184"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="IconBackgroundWavyContour" translatesAutoresizingMaskIntoConstraints="NO" id="App-wM-VL8">
+                                <rect key="frame" x="160" y="214" width="339" height="339"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" image="IconsBackgroundIntertwinesvg" translatesAutoresizingMaskIntoConstraints="NO" id="UjD-O5-b2l">
+                                <rect key="frame" x="-174" y="384" width="397" height="383"/>
+                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="j9t-71-Bc3">
+                                <rect key="frame" x="16" y="762" width="361" height="40"/>
+                                <subviews>
+                                    <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" placeholder="New task" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iWM-0J-vyN">
+                                        <rect key="frame" x="0.0" y="0.0" width="296.33333333333331" height="40"/>
+                                        <color key="backgroundColor" name="appGrey"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="16"/>
+                                            </userDefinedRuntimeAttribute>
+                                            <userDefinedRuntimeAttribute type="boolean" keyPath="layer.borderColor" value="YES"/>
+                                        </userDefinedRuntimeAttributes>
+                                    </textField>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="shf-71-cxz">
+                                        <rect key="frame" x="306.33333333333331" y="0.0" width="54.666666666666686" height="40"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" title="Add">
+                                            <color key="baseBackgroundColor" name="appBlue"/>
+                                        </buttonConfiguration>
+                                        <connections>
+                                            <action selector="addNewTaskButtonAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="LGM-9x-kfy"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="40" id="g7n-mv-Bb8"/>
+                                </constraints>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="xNc-fW-upC">
+                                <rect key="frame" x="16" y="148" width="361" height="100"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="100" id="0lI-WX-FaS"/>
+                                </constraints>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="vDu-zF-Fre"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="MCa-Zi-3Ke" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="4ou-EU-pKl"/>
+                            <constraint firstItem="App-wM-VL8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="160" id="8pu-u7-iOr"/>
+                            <constraint firstItem="xNc-fW-upC" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="BMP-VK-rFf"/>
+                            <constraint firstItem="xNc-fW-upC" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="30" id="FCU-Ca-e9V"/>
+                            <constraint firstItem="UjD-O5-b2l" firstAttribute="top" secondItem="MCa-Zi-3Ke" secondAttribute="bottom" constant="200" id="G9s-yB-0Dq"/>
+                            <constraint firstItem="MCa-Zi-3Ke" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="GYo-xS-w1o"/>
+                            <constraint firstItem="j9t-71-Bc3" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="JFk-P9-s3f"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="j9t-71-Bc3" secondAttribute="trailing" constant="16" id="QWf-qa-KGc"/>
+                            <constraint firstAttribute="bottom" secondItem="j9t-71-Bc3" secondAttribute="bottom" constant="50" id="Y4D-DZ-pfX"/>
+                            <constraint firstItem="xNc-fW-upC" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="e92-a8-LqM"/>
+                            <constraint firstItem="MCa-Zi-3Ke" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="gFU-lE-WYG"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="UjD-O5-b2l" secondAttribute="trailing" constant="170" id="jFS-p3-3Wv"/>
+                            <constraint firstItem="App-wM-VL8" firstAttribute="top" secondItem="MCa-Zi-3Ke" secondAttribute="bottom" constant="30" id="mfZ-4M-S5O"/>
+                            <constraint firstItem="MCa-Zi-3Ke" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" id="so5-bm-wfU"/>
+                            <constraint firstItem="j9t-71-Bc3" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="vWl-ss-AIA"/>
+                            <constraint firstItem="xNc-fW-upC" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" constant="-16" id="wCW-PC-1IT"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="StackTaskListView" destination="xNc-fW-upC" id="RNe-o0-kZ2"/>
+                        <outlet property="textFieldOutlet" destination="iWM-0J-vyN" id="tQl-8X-IH1"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="139.69465648854961" y="130.98591549295776"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="IconBackgroundDot" width="399" height="184"/>
+        <image name="IconBackgroundWavyContour" width="339" height="339"/>
+        <image name="IconsBackgroundIntertwinesvg" width="397" height="383"/>
+        <namedColor name="appBlue">
+            <color red="0.0" green="0.53299999237060547" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="appGrey">
+            <color red="0.92900002002716064" green="0.92900002002716064" blue="0.92900002002716064" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
