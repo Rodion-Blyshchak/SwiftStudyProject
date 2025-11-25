@@ -10,17 +10,17 @@ import UIKit
 class StoryboardViewController: UIViewController {
 	var taskList: [String] = []
 	
-	@IBOutlet weak var StackTaskListView: UIStackView!
-	@IBOutlet weak var textFieldOutlet: UITextField!
+	@IBOutlet weak var stackTaskListView: UIStackView!
+	@IBOutlet weak var textField: UITextField!
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 	}
 	
 	@IBAction func addNewTaskButtonAction(_ sender: Any) {
-		if let task = textFieldOutlet.text, !task.isEmpty {
+		if let task = textField.text, !task.isEmpty {
 			taskList.append(task)
-			textFieldOutlet.text = nil
+			textField.text = nil
 			updateTaskListView()
 		}  else {
 			let alert = UIAlertController(title: "Уппс", message: "Текст не може бути порожнім!", preferredStyle: .alert)
@@ -36,17 +36,17 @@ class StoryboardViewController: UIViewController {
 	}
 	
 	private func updateTaskListView() {
-		StackTaskListView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+		stackTaskListView.arrangedSubviews.forEach { $0.removeFromSuperview() }
 		
 		for (index, task) in taskList.enumerated() {
 			let taskRow = ItemTaskStoryboardView()
 			taskRow.translatesAutoresizingMaskIntoConstraints = false
-			taskRow.LabelOutlet.text = task
+			taskRow.labelText.text = task
 			taskRow.taskIndex = index
 			taskRow.removeTaskAction = { [weak self] receivedIndex in
 				self?.removeTask(at: receivedIndex)
 			}
-			StackTaskListView.addArrangedSubview(taskRow)
+			stackTaskListView.addArrangedSubview(taskRow)
 		}
 	}
 }

@@ -9,7 +9,7 @@ import UIKit
 
 class ItemTaskStoryboardView: UIView {
 
-	@IBOutlet weak var LabelOutlet: UILabel!
+	@IBOutlet weak var labelText: UILabel!
 	
 	override init(frame: CGRect) {
 		super.init(frame: frame)
