@@ -15,14 +15,14 @@ class ViewController: UIViewController {
 		//	ViewLesson1.shared.getRandomValue()
 		//	ViewLesson2.shared.studentAndClassResults()
 		//	ViewLesson3.shared.vehicleSimulatorAndStatics()
-		ViewLesson4.shared.start()
+		//	ViewLesson4.shared.start()
 
 	}
 	
 	@IBAction func StoryboardViewController(_ sender: Any) {
-		let storyboard = UIStoryboard(name: "StoryboardViewController", bundle: nil )
-		let viewController = storyboard.instantiateViewController(identifier: "StoryboardViewController") as! StoryboardViewController
-		navigationController?.pushViewController(viewController, animated: true )
+		let storyboard = UIStoryboard(name: "StoryboardTableViewController", bundle: nil)
+		let viewController = storyboard.instantiateViewController(identifier: "StoryboardTableViewController") as! StoryboardTableViewController
+		navigationController?.pushViewController(viewController, animated: true)
 	}
 	
 	@IBAction func ConstrainsViewController(_ sender: Any) {
