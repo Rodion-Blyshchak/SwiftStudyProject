@@ -26,7 +26,7 @@ class ViewController: UIViewController {
 	}
 	
 	@IBAction func ConstrainsViewController(_ sender: Any) {
-		let viewController = ConstraintsViewController()
+		let viewController = ConstraintsTableViewController()
 		navigationController?.pushViewController(viewController, animated: true)
 	}
 	

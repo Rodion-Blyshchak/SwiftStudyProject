@@ -8,7 +8,7 @@
 import UIKit
 
 class StoryboardTableViewController: UIViewController {
-	var taskList: [TaskItem] = []
+	private	var taskList: [TaskItem] = []
 	
 	@IBOutlet weak var tableView: UITableView!
 	@IBOutlet weak var textField: UITextField!
