@@ -8,5 +8,5 @@
 import UIKit
 
 struct TaskItem {
-	let titleTask: String
+	let title: String
 }

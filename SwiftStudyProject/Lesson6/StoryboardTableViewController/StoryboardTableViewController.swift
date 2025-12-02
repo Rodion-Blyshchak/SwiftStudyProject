@@ -21,9 +21,9 @@ class StoryboardTableViewController: UIViewController {
 		textField.delegate = self
 	}
 	
-	@IBAction func AddNewTaskButtonAction(_ sender: Any?) {
+	private func addNewTask() {
 		if let task = textField.text, !task.isEmpty {
-			let newTask = TaskItem(titleTask: task)
+			let newTask = TaskItem(title: task)
 			taskList.append(newTask)
 			textField.text = nil
 			tableView.reloadData()
@@ -32,6 +32,10 @@ class StoryboardTableViewController: UIViewController {
 			alert.addAction(UIAlertAction(title: "OK", style: .default))
 			self.present(alert, animated: true, completion: nil)
 		}
+	}
+	
+	@IBAction func addTaskButtun(_ sender: Any) {
+		addNewTask()
 	}
 }
 
@@ -42,31 +46,11 @@ extension StoryboardTableViewController: UITableViewDelegate {
 		return true
 	}
 	
-	//	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-	//		if editingStyle == .delete {
-	//			taskList.remove(at: indexPath.row)
-	//			tableView.deleteRows(at: [indexPath ], with: .automatic)
-	//		}
-	//	}
-	
-	func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-		let deleteTask = UIContextualAction(style: .normal, title: nil) {[weak self] (_,_, completion) in
-			guard let self = self else { return completion(false) }
-			self.taskList.remove(at: indexPath.row)
-			tableView.deleteRows(at: [indexPath], with: .automatic)
-			completion(true)
+	func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+		if editingStyle == .delete {
+			taskList.remove(at: indexPath.row)
+			tableView.deleteRows(at: [indexPath ], with: .automatic)
 		}
-		
-		let pinTask = UIContextualAction(style: .normal, title: nil) {_,_, completion in
-			completion(true)
-		}
-		deleteTask.backgroundColor = .appRed
-		deleteTask.image = .trash
-		
-		pinTask.backgroundColor = .appBlue
-		pinTask.image = .pin
-		
-		return UISwipeActionsConfiguration(actions: [deleteTask, pinTask])
 	}
 }
  
@@ -78,7 +62,7 @@ extension StoryboardTableViewController: UITableViewDataSource {
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let cell = UITableViewCell()
 		var configuration = UIListContentConfiguration.cell()
-		configuration.text = taskList[indexPath.row].titleTask
+		configuration.text = taskList[indexPath.row].title
 		cell.contentConfiguration = configuration
 		return cell
 	}
@@ -90,7 +74,7 @@ extension StoryboardTableViewController: UITableViewDataSource {
 
 extension StoryboardTableViewController: UITextFieldDelegate {
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		AddNewTaskButtonAction(nil)
+		addNewTask()
 		textField.resignFirstResponder()
 		return true
 	}

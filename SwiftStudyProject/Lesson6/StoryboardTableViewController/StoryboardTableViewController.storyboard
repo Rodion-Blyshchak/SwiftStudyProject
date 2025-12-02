@@ -63,7 +63,7 @@
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="filled" title="Add"/>
                                         <connections>
-                                            <action selector="AddNewTaskButtonAction:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="vfB-aC-hdJ"/>
+                                            <action selector="addTaskButtun:" destination="Y6W-OH-hqX" eventType="touchUpInside" id="oaO-DB-ebM"/>
                                         </connections>
                                     </button>
                                 </subviews>
