@@ -65,6 +65,7 @@ class NewTaskInputView: UIView {
 		addSubview(staskView)
 		staskView.addArrangedSubview(textField)
 		staskView.addArrangedSubview(addTaskButton)
+        textField.delegate = self
 		
 		NSLayoutConstraint.activate([
 			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: ConstantsSize.leadingAnchor),
@@ -91,6 +92,16 @@ class NewTaskInputView: UIView {
 	}
 	
 	var delegate: NewTaskInputViewDelegate?
+}
+
+extension NewTaskInputView: UITextFieldDelegate {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        true
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        delegate?.didInputNewTask(text: textField.text)
+    }
 }
 
 // other class

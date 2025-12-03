@@ -71,23 +71,21 @@ class ConstraintsViewController: UIViewController {
 	
 	//MARK: - inputNewTask
 	private func setupNewTaskInputView() {
-			view.addSubview(newTaskView)
-			newTaskView.translatesAutoresizingMaskIntoConstraints = false
-			newTaskView.placeholderTextField(with: "New task")
-			newTaskView.addTaskButtonAction = {
-			self.handleAddTaskAction()
-			}
-			
-			NSLayoutConstraint.activate([
-				newTaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-				newTaskView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-				newTaskView.heightAnchor.constraint(equalToConstant: 60),
-				newTaskView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-			])
-		}
+        view.addSubview(newTaskView)
+        newTaskView.translatesAutoresizingMaskIntoConstraints = false
+        newTaskView.placeholderTextField(with: "New task")
+        newTaskView.delegate = self
+        
+        NSLayoutConstraint.activate([
+            newTaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            newTaskView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            newTaskView.heightAnchor.constraint(equalToConstant: 60),
+            newTaskView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+    }
 	
-	private func handleAddTaskAction() {
-		if let task = self.newTaskView.textFieldVaule, !task.isEmpty {
+    private func handleAddTaskAction(text: String?) {
+		if let task = text, !task.isEmpty {
 			self.taskList.append(task)
 			self.updateTaskListView()
 			self.newTaskView.setTextField(with: nil)
@@ -130,4 +128,10 @@ class ConstraintsViewController: UIViewController {
 			taskListView.addTaskView(taskRow)
 		}
 	}
+}
+
+extension ConstraintsViewController: NewTaskInputViewDelegate {
+    func didInputNewTask(text: String?) {
+        handleAddTaskAction(text: text)
+    }
 }
