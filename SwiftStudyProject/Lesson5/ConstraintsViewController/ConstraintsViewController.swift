@@ -74,9 +74,7 @@ class ConstraintsViewController: UIViewController {
 			view.addSubview(newTaskView)
 			newTaskView.translatesAutoresizingMaskIntoConstraints = false
 			newTaskView.placeholderTextField(with: "New task")
-			newTaskView.addTaskButtonAction = {
-			self.handleAddTaskAction()
-			}
+			newTaskView.delegate = self
 			
 			NSLayoutConstraint.activate([
 				newTaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -86,8 +84,8 @@ class ConstraintsViewController: UIViewController {
 			])
 		}
 	
-	private func handleAddTaskAction() {
-		if let task = self.newTaskView.textFieldVaule, !task.isEmpty {
+	private func handleAddTaskAction(text: String?) {
+		if let task = text, !task.isEmpty {
 			self.taskList.append(task)
 			self.updateTaskListView()
 			self.newTaskView.setTextField(with: nil)
@@ -129,5 +127,12 @@ class ConstraintsViewController: UIViewController {
 			}
 			taskListView.addTaskView(taskRow)
 		}
+	}
+}
+
+// MARK: Extension
+extension ConstraintsViewController: NewTaskInputViewDelegate {
+	func didInputNewTask(text: String?) {
+		handleAddTaskAction(text: text)
 	}
 }

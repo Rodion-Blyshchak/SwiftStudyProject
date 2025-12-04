@@ -40,9 +40,6 @@ class ConstraintsTableViewController: UIViewController {
 		newTaskView.translatesAutoresizingMaskIntoConstraints = false
 		newTaskView.placeholderTextField(with: "New task")
 		newTaskView.delegate = self
-//		newTaskView.addTaskButtonAction = {
-//			self.handleAddTaskAction()
-//		}
 		
 		NSLayoutConstraint.activate([
 			newTaskView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
@@ -51,9 +48,9 @@ class ConstraintsTableViewController: UIViewController {
 			newTaskView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
 		])
 	}
-	//
-	private func handleAddTaskAction() {
-		if let task = self.newTaskView.textFieldVaule, !task.isEmpty {
+	
+	private func handleAddTaskAction(text: String?) {
+		if let task = text, !task.isEmpty {
 			let newTask = TaskItem(title: task)
 			taskList.append(newTask)
 			newTaskView.setTextField(with: nil)
@@ -100,13 +97,6 @@ extension ConstraintsTableViewController: UITableViewDataSource {
 
 extension ConstraintsTableViewController: NewTaskInputViewDelegate {
 	func didInputNewTask(text: String?) {
-		print("Hi!")
+		handleAddTaskAction(text: text)  
 	}
 }
-
-//
-//func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-//	self.handleAddTaskAction()
-//	textField.resignFirstResponder()
-//	return true
-//}
