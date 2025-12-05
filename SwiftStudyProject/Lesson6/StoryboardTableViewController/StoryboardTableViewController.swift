@@ -17,6 +17,8 @@ class StoryboardTableViewController: UIViewController {
 		super.viewDidLoad()
 		tableView.delegate = self
 		tableView.dataSource = self
+		let nib = UINib(nibName: "StoryboardTableViewCell", bundle: nil)
+		tableView.register(nib, forCellReuseIdentifier: "StoryboardTableViewCell")
 		
 		textField.delegate = self
 	}
@@ -60,10 +62,8 @@ extension StoryboardTableViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = UITableViewCell()
-		var configuration = UIListContentConfiguration.cell()
-		configuration.text = taskList[indexPath.row].title
-		cell.contentConfiguration = configuration
+		let cell = tableView.dequeueReusableCell(withIdentifier: "StoryboardTableViewCell", for: indexPath) as! StoryboardTableViewCell
+		cell.configureLableText(with: taskList[indexPath.row].title)
 		return cell
 	}
 	

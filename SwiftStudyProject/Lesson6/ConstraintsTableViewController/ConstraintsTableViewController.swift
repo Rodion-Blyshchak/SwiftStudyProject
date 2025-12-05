@@ -15,6 +15,7 @@ class ConstraintsTableViewController: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
+		tableView.register(ConstraintsTableViewCell.self, forCellReuseIdentifier: ConstraintsTableViewCell.reuseId)
 
 		setupTableView()
 		setupInputView()
@@ -22,6 +23,7 @@ class ConstraintsTableViewController: UIViewController {
 	
 	// MARK: SetupFunc
 	private func setupTableView() {
+		tableView.separatorStyle = .none
 		tableView.translatesAutoresizingMaskIntoConstraints = false
 		view.addSubview(tableView)
 		tableView.dataSource = self
@@ -83,7 +85,7 @@ extension ConstraintsTableViewController: UITableViewDataSource {
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let cell = UITableViewCell()
+		let cell = tableView.dequeueReusableCell(withIdentifier: ConstraintsTableViewCell.reuseId, for: indexPath) as! ConstraintsTableViewCell
 		var confiration = UIListContentConfiguration.cell()
 		confiration.text = taskList[indexPath.row].title
 		cell.contentConfiguration = confiration
