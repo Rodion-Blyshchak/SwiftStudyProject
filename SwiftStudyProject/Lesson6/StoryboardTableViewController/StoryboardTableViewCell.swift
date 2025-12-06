@@ -8,14 +8,13 @@
 import UIKit
 
 class StoryboardTableViewCell: UITableViewCell {
-	@IBOutlet weak var imageBackgroundView: UIImageView!
-	@IBOutlet weak var lableTask: UILabel!
+	@IBOutlet weak var lable: UILabel!
 
 	required init?(coder: NSCoder) {
 		super.init(coder: coder)
 	}
 	
 	func configureLableText(with text: String) {
-		lableTask.text = text
+		lable.text = text
 	}
 }

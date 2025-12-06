@@ -10,7 +10,7 @@ import UIKit
 class ConstraintsTableViewCell: UITableViewCell {
 	static let reuseId = "ConstraintsTableViewCell"
 	
-	private var lableCell: UILabel = {
+	private var lable: UILabel = {
 		let lable = UILabel()
 		lable.textColor = .appBlack
 		lable.font = .systemFont(ofSize: 20, weight: .medium)
@@ -18,7 +18,8 @@ class ConstraintsTableViewCell: UITableViewCell {
 		return lable
 	}()
 	
-	private var imageCell: UIImageView = {
+	// imageView уже використовується у UITableViewCell - open var imageView: UIImageView? { get }
+	private var iconView: UIImageView = {
 		let image = UIImageView()
 		image.translatesAutoresizingMaskIntoConstraints = false
 		image.heightAnchor.constraint(equalToConstant: 30).isActive = true
@@ -33,7 +34,7 @@ class ConstraintsTableViewCell: UITableViewCell {
 		setupTableViewCell()
 	}
 	
-	private var staskView: UIStackView = {
+	private var stackView: UIStackView = {
 		let view = UIStackView()
 		view.translatesAutoresizingMaskIntoConstraints = false
 		view.backgroundColor = .appGrey
@@ -51,15 +52,15 @@ class ConstraintsTableViewCell: UITableViewCell {
 	}
 	
 	private func setupTableViewCell() {
-		addSubview(staskView)
-		staskView.addArrangedSubview(lableCell)
-		staskView.addArrangedSubview(imageCell)
+		addSubview(stackView)
+		stackView.addArrangedSubview(lable)
+		stackView.addArrangedSubview(iconView)
 		
 		NSLayoutConstraint.activate([
-			staskView.topAnchor.constraint(equalTo: self.topAnchor),
-			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-			staskView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-			staskView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
+			stackView.topAnchor.constraint(equalTo: self.topAnchor),
+			stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
+			stackView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
+			stackView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
 		])
 	}
 }

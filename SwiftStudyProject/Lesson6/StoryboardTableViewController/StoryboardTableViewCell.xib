@@ -41,8 +41,7 @@
                 </constraints>
             </tableViewCellContentView>
             <connections>
-                <outlet property="imageBackgroundView" destination="bVt-yU-j6I" id="zwQ-3J-otf"/>
-                <outlet property="lableTask" destination="gkK-mh-k00" id="XgK-3g-Zdm"/>
+                <outlet property="lable" destination="gkK-mh-k00" id="s6x-EX-9x8"/>
             </connections>
             <point key="canvasLocation" x="386.25954198473283" y="34.507042253521128"/>
         </tableViewCell>
