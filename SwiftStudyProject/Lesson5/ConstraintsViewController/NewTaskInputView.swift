@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol NewTaskInputViewDelegate {
+	func didInputNewTask(text: String?)
+}
+
 class NewTaskInputView: UIView {
 	enum ConstantsSize {
 		static let cornerRadius: CGFloat = 16
@@ -61,6 +65,7 @@ class NewTaskInputView: UIView {
 		addSubview(staskView)
 		staskView.addArrangedSubview(textField)
 		staskView.addArrangedSubview(addTaskButton)
+		textField.delegate = self
 		
 		NSLayoutConstraint.activate([
 			staskView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: ConstantsSize.leadingAnchor),
@@ -80,9 +85,21 @@ class NewTaskInputView: UIView {
 		textField.text
 	}
 	
-	var addTaskButtonAction: (() -> Void)?
-	
 	@objc func addTask() {
-		addTaskButtonAction?()
+		delegate?.didInputNewTask(text: textField.text)
+	}
+	
+	var delegate: NewTaskInputViewDelegate?
+}
+
+extension NewTaskInputView: UITextFieldDelegate {
+	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+		delegate?.didInputNewTask(text: textField.text)
+		textField.resignFirstResponder()
+		return true
 	}
 }
+
+// other class
+// NewTaskInputView.textField.text - напряму -> NewTaskInputView.getText()
+// getText -> return textField.text

@@ -56,10 +56,10 @@
                                     <constraint firstAttribute="height" constant="40" id="g7n-mv-Bb8"/>
                                 </constraints>
                             </stackView>
-                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="xNc-fW-upC">
-                                <rect key="frame" x="16" y="148" width="361" height="100"/>
+                            <stackView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ndA-mC-gvR">
+                                <rect key="frame" x="16" y="168" width="361" height="60"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="100" id="0lI-WX-FaS"/>
+                                    <constraint firstAttribute="height" constant="60" id="DCA-Qh-d0e"/>
                                 </constraints>
                             </stackView>
                         </subviews>
@@ -68,25 +68,25 @@
                         <constraints>
                             <constraint firstItem="MCa-Zi-3Ke" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="top" id="4ou-EU-pKl"/>
                             <constraint firstItem="App-wM-VL8" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="160" id="8pu-u7-iOr"/>
-                            <constraint firstItem="xNc-fW-upC" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="BMP-VK-rFf"/>
-                            <constraint firstItem="xNc-fW-upC" firstAttribute="top" secondItem="vDu-zF-Fre" secondAttribute="top" constant="30" id="FCU-Ca-e9V"/>
                             <constraint firstItem="UjD-O5-b2l" firstAttribute="top" secondItem="MCa-Zi-3Ke" secondAttribute="bottom" constant="200" id="G9s-yB-0Dq"/>
                             <constraint firstItem="MCa-Zi-3Ke" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="GYo-xS-w1o"/>
                             <constraint firstItem="j9t-71-Bc3" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="JFk-P9-s3f"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="j9t-71-Bc3" secondAttribute="trailing" constant="16" id="QWf-qa-KGc"/>
+                            <constraint firstItem="ndA-mC-gvR" firstAttribute="top" secondItem="5EZ-qb-Rvc" secondAttribute="topMargin" constant="50" id="X0y-fX-nDP"/>
                             <constraint firstAttribute="bottom" secondItem="j9t-71-Bc3" secondAttribute="bottom" constant="50" id="Y4D-DZ-pfX"/>
-                            <constraint firstItem="xNc-fW-upC" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="e92-a8-LqM"/>
+                            <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="ndA-mC-gvR" secondAttribute="trailing" constant="16" id="ZyJ-K2-RiX"/>
+                            <constraint firstItem="ndA-mC-gvR" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="agq-59-3K5"/>
                             <constraint firstItem="MCa-Zi-3Ke" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" id="gFU-lE-WYG"/>
                             <constraint firstItem="vDu-zF-Fre" firstAttribute="trailing" secondItem="UjD-O5-b2l" secondAttribute="trailing" constant="170" id="jFS-p3-3Wv"/>
                             <constraint firstItem="App-wM-VL8" firstAttribute="top" secondItem="MCa-Zi-3Ke" secondAttribute="bottom" constant="30" id="mfZ-4M-S5O"/>
                             <constraint firstItem="MCa-Zi-3Ke" firstAttribute="leading" secondItem="5EZ-qb-Rvc" secondAttribute="leading" id="so5-bm-wfU"/>
+                            <constraint firstItem="ndA-mC-gvR" firstAttribute="centerX" secondItem="5EZ-qb-Rvc" secondAttribute="centerX" id="uhv-cf-4dM"/>
                             <constraint firstItem="j9t-71-Bc3" firstAttribute="leading" secondItem="vDu-zF-Fre" secondAttribute="leading" constant="16" id="vWl-ss-AIA"/>
-                            <constraint firstItem="xNc-fW-upC" firstAttribute="trailing" secondItem="vDu-zF-Fre" secondAttribute="trailing" constant="-16" id="wCW-PC-1IT"/>
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="StackTaskListView" destination="xNc-fW-upC" id="RNe-o0-kZ2"/>
-                        <outlet property="textFieldOutlet" destination="iWM-0J-vyN" id="tQl-8X-IH1"/>
+                        <outlet property="stackTaskListView" destination="ndA-mC-gvR" id="6FB-0J-yfp"/>
+                        <outlet property="textField" destination="iWM-0J-vyN" id="00n-o1-Voj"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ief-a0-LHa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
