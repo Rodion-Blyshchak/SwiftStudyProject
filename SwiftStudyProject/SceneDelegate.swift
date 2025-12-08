@@ -20,31 +20,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 	}
 
 	func sceneDidDisconnect(_ scene: UIScene) {
-		// Called as the scene is being released by the system.
-		// This occurs shortly after the scene enters the background, or when its session is discarded.
-		// Release any resources associated with this scene that can be re-created the next time the scene connects.
-		// The scene may re-connect later, as its session was not necessarily discarded (see `application:didDiscardSceneSessions` instead).
+		print(#function, "Додаток повністю вимкнений")
+		// Метод спрацьовує лише коли із активного додатку відкрили меню багатозадачності та завершили його
+		// Якщо ж додаток згорнути, а потім відкрити багатозадачність та завершили його, метод не спрацює
 	}
 
 	func sceneDidBecomeActive(_ scene: UIScene) {
-		// Called when the scene has moved from an inactive state to an active state.
-		// Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+		print(#function, "Передній план додатку повністю загружений")
 	}
 
 	func sceneWillResignActive(_ scene: UIScene) {
-		// Called when the scene will move from an active state to an inactive state.
-		// This may occur due to temporary interruptions (ex. an incoming phone call).
+		print(#function, "Метод спрацьовує коли додаток відкриваємо меню багатозадочності")
 	}
 
 	func sceneWillEnterForeground(_ scene: UIScene) {
-		// Called as the scene transitions from the background to the foreground.
-		// Use this method to undo the changes made on entering the background.
+		print(#function, "Викликається коли додаток переходить із фону на передній план або коли його тільки відкривають")
 	}
 
 	func sceneDidEnterBackground(_ scene: UIScene) {
-		// Called as the scene transitions from the foreground to the background.
-		// Use this method to save data, release shared resources, and store enough scene-specific state information
-		// to restore the scene back to its current state.
+		print(#function, "Фоновий режим")
 	}
 
 
