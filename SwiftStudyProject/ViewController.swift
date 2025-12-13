@@ -8,7 +8,6 @@
 import UIKit
 
 class ViewController: UIViewController {
-	private var mainVeloceViewController = NewTaskInputView()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -16,21 +15,6 @@ class ViewController: UIViewController {
 		//	ViewLesson2.shared.studentAndClassResults()
 		//	ViewLesson3.shared.vehicleSimulatorAndStatics()
 		//	ViewLesson4.shared.start()
-
-		setupMainView()
-	}
-	
-	private func setupMainView() {
-		view.addSubview(mainVeloceViewController)
-		mainVeloceViewController.translatesAutoresizingMaskIntoConstraints = false
-		mainVeloceViewController.backgroundColor = .appGreen
-		
-		NSLayoutConstraint.activate([
-			mainVeloceViewController.topAnchor.constraint(equalTo: view.topAnchor),
-			mainVeloceViewController.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			mainVeloceViewController.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-			mainVeloceViewController.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-		])
 	}
 	
 //	@IBAction func StoryboardViewController(_ sender: Any) {
