@@ -8,13 +8,23 @@
 import UIKit
 
 class CollectionCell: UICollectionViewCell {
+	enum ConstantsSize {
+		static let heightView: CGFloat = 120
+		static let widthView: CGFloat = 173
+		static let numberOfLines: CGFloat = 0
+		static let fontTitle: CGFloat = 24
+		static let fontSubTitle: CGFloat = 16
+		static let cornerRadius: CGFloat = 8
+		static let spacing: CGFloat = 4
+	}
+	
 	static let reuseId = "CollectionCell"
 	
 	private let imageCell: UIImageView = {
 		let image = UIImageView()
 		image.translatesAutoresizingMaskIntoConstraints = false
 		image.contentMode = .scaleAspectFill
-		image.layer.cornerRadius = 8
+		image.layer.cornerRadius = ConstantsSize.cornerRadius
 		image.clipsToBounds = true
 		return image
 	}()
@@ -23,7 +33,7 @@ class CollectionCell: UICollectionViewCell {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
 		title.textColor = .appBlack
-		title.font = .systemFont(ofSize: 24, weight: .medium)
+		title.font = .systemFont(ofSize: ConstantsSize.fontTitle, weight: .medium)
 		title.numberOfLines = 0
 		return title
 	}()
@@ -32,7 +42,7 @@ class CollectionCell: UICollectionViewCell {
 		let sub = UILabel()
 		sub.translatesAutoresizingMaskIntoConstraints = false
 		sub.textColor = .appGreyDark
-		sub.font = .systemFont(ofSize: 16, weight: .medium)
+		sub.font = .systemFont(ofSize: ConstantsSize.fontSubTitle, weight: .medium)
 		sub.numberOfLines = 0
 		return sub
 	}()
@@ -43,7 +53,7 @@ class CollectionCell: UICollectionViewCell {
 		stack.axis = .vertical
 		stack.alignment = .fill
 		stack.distribution = .fill
-		stack.spacing = 4
+		stack.spacing = ConstantsSize.spacing
 		return stack
 	}()
 	
@@ -64,8 +74,8 @@ class CollectionCell: UICollectionViewCell {
 		contentView.clipsToBounds = true
 		
 		NSLayoutConstraint.activate([
-			imageCell.heightAnchor.constraint(equalToConstant: 120),
-			imageCell.widthAnchor.constraint(equalToConstant: 173),
+			imageCell.heightAnchor.constraint(equalToConstant: ConstantsSize.heightView),
+			imageCell.widthAnchor.constraint(equalToConstant: ConstantsSize.widthView),
 			
 			stackView.topAnchor.constraint(equalTo: self.topAnchor),
 			stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
