@@ -15,28 +15,16 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
-				Lesson7/CollectionCellStruct.swift,
 			);
 			target = 22F0107D2E93A33600520DDF /* SwiftStudyProject */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
-/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
-		229619F42EEDB42A00D15ACA /* Exceptions for "SwiftStudyProject" folder in "Compile Sources" phase from "SwiftStudyProject" target */ = {
-			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
-			buildPhase = 22F0107A2E93A33600520DDF /* Sources */;
-			membershipExceptions = (
-				Lesson7/CollectionCellStruct.swift,
-			);
-		};
-/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		22F010802E93A33600520DDF /* SwiftStudyProject */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				22F010902E93A33700520DDF /* Exceptions for "SwiftStudyProject" folder in "SwiftStudyProject" target */,
-				229619F42EEDB42A00D15ACA /* Exceptions for "SwiftStudyProject" folder in "Compile Sources" phase from "SwiftStudyProject" target */,
 			);
 			path = SwiftStudyProject;
 			sourceTree = "<group>";

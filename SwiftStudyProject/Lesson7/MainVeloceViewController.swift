@@ -12,39 +12,21 @@ class MainVeloceViewController: UIViewController {
 	enum ConstantsSize {
 		static let imageHeightAnchor: CGFloat = 40
 		static let imageWidthAnchor: CGFloat = 40
-		static let mainIndent: CGFloat = 16
-		static let negativeMainIndent: CGFloat = -16
+		static let mainIndent: CGFloat = 14
+		static let negativeMainIndent: CGFloat = -14
 		static let fontTitle: CGFloat = 32
 		static let fontSubTitle: CGFloat = 16
-		static let cornerRadius: CGFloat = 20
+		static let cornerRadius: CGFloat = imageWidthAnchor / 2
 	}
-	
-	private let commonImage: UIImage = {
-		let imageCell = "Neon orange glasses on silhouette profile"
-		if let image = UIImage(named: imageCell) {
-			return image
-		} else {
-			return UIImage(systemName: "photo.fill") ?? UIImage()
-		}
-	}()
-	
-	private lazy var listCollectionCell: [CollectionCellStruct] = [
-		CollectionCellStruct(image: self.commonImage, title: "RB20", subtitle: "Red Bull Racing"),
-		CollectionCellStruct(image: self.commonImage, title: "SF-24", subtitle: "Scuderia Ferrari"),
-		CollectionCellStruct(image: self.commonImage, title: "W15", subtitle: "Mercedes-AMG PETRONAS"),
-		CollectionCellStruct(image: self.commonImage, title: "MCL38", subtitle: "McLaren Formula 1 Team"),
-		CollectionCellStruct(image: self.commonImage, title: "A524", subtitle: "Alpine F1 Team")
-		
-	]
 
 	let searchController = UISearchController(searchResultsController: nil)
-	var filterListCollectionCell: [CollectionCellStruct] = []
+	var filterListCollectionCell: [CollectionCellStruct] = CollectionCellStruct.listCollectionCell
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		navigationController?.setNavigationBarHidden(true, animated: false)
-		filterListCollectionCell = listCollectionCell
+		filterListCollectionCell = CollectionCellStruct.listCollectionCell
 		searchController.searchResultsUpdater = self
 		navigationItem.searchController = searchController
 		
@@ -114,15 +96,14 @@ class MainVeloceViewController: UIViewController {
 	//MARK: - Search
 	private func filterSearchController(with searchText: String) {
 		guard !searchText.isEmpty else {
-			filterListCollectionCell = listCollectionCell
+			filterListCollectionCell = CollectionCellStruct.listCollectionCell
 			layotCollectionView.reloadData()
 			return
 		}
 		
-		// Поправити регістр!
 		// title subtitle
-		filterListCollectionCell = listCollectionCell.filter { item in
-			return item.title.contains(searchText.lowercased()) || item.subtitle.contains(searchText.lowercased())
+		filterListCollectionCell = CollectionCellStruct.listCollectionCell.filter { item in
+			return item.title.lowercased().contains(searchText.lowercased()) || item.subtitle.lowercased().contains(searchText.lowercased())
 		}
 		
 		layotCollectionView.reloadData()
@@ -143,6 +124,7 @@ class MainVeloceViewController: UIViewController {
 	private func setupCollection() {
 		view.addSubview(layotCollectionView)
 		layotCollectionView.dataSource = self
+		layotCollectionView.delegate = self
 		layotCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.reuseId)
 		
 		NSLayoutConstraint.activate([
@@ -165,6 +147,15 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 		let itemData = filterListCollectionCell [indexPath.item]
 		cell.configure(with: itemData)
 		return cell
+	}
+}
+
+extension MainVeloceViewController: UICollectionViewDelegate {
+	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+		let select = filterListCollectionCell[indexPath.item]
+		let DescriptionCellVeloceViewController = DescriptionCellVeloceViewController()
+		DescriptionCellVeloceViewController.data = select
+		navigationController?.pushViewController(DescriptionCellVeloceViewController, animated: true)
 	}
 }
 
