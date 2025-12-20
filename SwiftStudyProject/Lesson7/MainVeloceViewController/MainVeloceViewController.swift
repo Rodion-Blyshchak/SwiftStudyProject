@@ -18,19 +18,30 @@ class MainVeloceViewController: UIViewController {
 		static let fontSubTitle: CGFloat = 16
 		static let cornerRadius: CGFloat = imageWidthAnchor / 2
 	}
+	
+	private var baseProvider = Base()
+	private lazy var dataCars: [CarModel] = baseProvider.baseCar
+	
+	private lazy var listCellModel: [CollectionViewCellModel] = dataCars.map { model in
+		CollectionViewCellModel(
+			id: model.id,
+			image: model.image,
+			title: model.name,
+			subTitle: model.team
+		)
+	}
 
-	let searchController = UISearchController(searchResultsController: nil)
-	var filterListCollectionCell: [CollectionCellStruct] = CollectionCellStruct.listCollectionCell
+	private let searchController = UISearchBar()
+	private lazy var filterListCollectionCell: [CollectionViewCellModel] = listCellModel
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		navigationController?.setNavigationBarHidden(true, animated: false)
-		filterListCollectionCell = CollectionCellStruct.listCollectionCell
-		searchController.searchResultsUpdater = self
-		navigationItem.searchController = searchController
+		filterListCollectionCell = listCellModel
 		
 		setupHeader()
+		setupSearch()
 		setupCollection()
 	}
 	
@@ -94,16 +105,35 @@ class MainVeloceViewController: UIViewController {
 	}
 	
 	//MARK: - Search
+	private lazy var searchView: UISearchBar = {
+		let search = searchController
+		search.translatesAutoresizingMaskIntoConstraints = false
+		search.placeholder = "Search"
+		search.searchBarStyle = .minimal
+		return search
+	}()
+	
+	private func setupSearch() {
+		searchView.delegate = self
+		view.addSubview(searchView)
+		
+		NSLayoutConstraint.activate([
+			searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+			searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+		])
+	}
+	
 	private func filterSearchController(with searchText: String) {
 		guard !searchText.isEmpty else {
-			filterListCollectionCell = CollectionCellStruct.listCollectionCell
+			filterListCollectionCell = listCellModel
 			layotCollectionView.reloadData()
 			return
 		}
 		
 		// title subtitle
-		filterListCollectionCell = CollectionCellStruct.listCollectionCell.filter { item in
-			return item.title.lowercased().contains(searchText.lowercased()) || item.subtitle.lowercased().contains(searchText.lowercased())
+		filterListCollectionCell = listCellModel.filter { item in
+			return item.title.lowercased().contains(searchText.lowercased()) || item.subTitle.lowercased().contains(searchText.lowercased())
 		}
 		
 		layotCollectionView.reloadData()
@@ -113,9 +143,8 @@ class MainVeloceViewController: UIViewController {
 	private let layotCollectionView: UICollectionView = {
 		let layot = UICollectionViewFlowLayout()
 		layot.scrollDirection = .vertical
-		layot.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+		layot.estimatedItemSize = .zero
 		layot.minimumLineSpacing = ConstantsSize.mainIndent
-		layot.minimumInteritemSpacing = ConstantsSize.mainIndent
 		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layot)
 		collectionView.translatesAutoresizingMaskIntoConstraints = false
 		return collectionView
@@ -129,7 +158,7 @@ class MainVeloceViewController: UIViewController {
 		
 		NSLayoutConstraint.activate([
 			layotCollectionView.topAnchor.constraint(equalTo: stackTitleView.bottomAnchor, constant: ConstantsSize.mainIndent),
-			layotCollectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+			layotCollectionView.bottomAnchor.constraint(equalTo: searchView.topAnchor),
 			layotCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
 			layotCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent)
 		])
@@ -152,15 +181,34 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		let select = filterListCollectionCell[indexPath.item]
+		let select = filterListCollectionCell [indexPath.item]
+		guard let fullCarModel = dataCars.first(where: { $0.id == select.id }) else { return }
+		
+		let detailModel = DetailViewControllerModel(
+			id: fullCarModel.id,
+			image: fullCarModel.image,
+			title: fullCarModel.name,
+			subTitle: fullCarModel.team,
+			description: fullCarModel.description
+		)
+
 		let DescriptionCellVeloceViewController = DescriptionCellVeloceViewController()
-		DescriptionCellVeloceViewController.data = select
+		DescriptionCellVeloceViewController.data = detailModel
 		navigationController?.pushViewController(DescriptionCellVeloceViewController, animated: true)
 	}
 }
 
-extension MainVeloceViewController: UISearchResultsUpdating {
-	func updateSearchResults(for searchController: UISearchController) {
-		filterSearchController(with: searchController.searchBar.text ?? "")
+extension MainVeloceViewController: UICollectionViewDelegateFlowLayout {
+	func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+		let widthView = collectionView.bounds.width
+		let spacing = ConstantsSize.mainIndent
+		
+		return CGSize(width: (Int(widthView) - Int(spacing)) / 2, height: 180)
+	}
+}
+
+extension MainVeloceViewController: UISearchBarDelegate {
+	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+		filterSearchController(with: searchText)
 	}
 }

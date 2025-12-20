@@ -19,8 +19,8 @@ class DescriptionCellVeloceViewController: UIViewController {
 		static let cornerRadius: CGFloat = 20
 	}
 	
-	var data: CollectionCellStruct?
-	
+	var data: DetailViewControllerModel?
+
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		navigationController?.setNavigationBarHidden(false, animated: animated)
@@ -117,7 +117,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		guard let data = data else { return } // повторюється!
 		
 		nameCar.text = data.title
-		teamCar.text = data.subtitle.uppercased()
+		teamCar.text = data.subTitle.uppercased()
 		stackTitle.addArrangedSubview(nameCar)
 		stackTitle.addArrangedSubview(teamCar)
 		view.addSubview(stackTitle)

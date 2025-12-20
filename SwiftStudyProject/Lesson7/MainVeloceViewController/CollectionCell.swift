@@ -75,7 +75,6 @@ class CollectionCell: UICollectionViewCell {
 		
 		NSLayoutConstraint.activate([
 			imageCell.heightAnchor.constraint(equalToConstant: ConstantsSize.heightView),
-			imageCell.widthAnchor.constraint(equalToConstant: ConstantsSize.widthView),
 			
 			stackView.topAnchor.constraint(equalTo: self.topAnchor),
 			stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -84,9 +83,9 @@ class CollectionCell: UICollectionViewCell {
 		])
 	}
 	
-	func configure(with item: CollectionCellStruct) {
+	func configure(with item: CollectionViewCellModel) {
 		imageCell.image = item.image
 		titleCell.text = item.title
-		subTitleCell.text = item.subtitle.uppercased()
+		subTitleCell.text = item.subTitle.uppercased()
 	}
 }
