@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct DetailViewControllerModel {
+struct DetailViewControllerViewModel {
 	let id: String
 	let image: UIImage
 	let title: String

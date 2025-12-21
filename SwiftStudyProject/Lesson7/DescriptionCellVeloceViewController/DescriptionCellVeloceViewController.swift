@@ -19,7 +19,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		static let cornerRadius: CGFloat = 20
 	}
 	
-	var data: DetailViewControllerModel?
+	var viewModel: DetailViewControllerViewModel?
 
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
@@ -51,9 +51,9 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}()
 	
 	private func setupTopContent() {
-		guard let data = data else { return }
+		guard let viewModel else { return }
 		
-		imageView.image = data.image
+		imageView.image = viewModel.image
 		
 		view.addSubview(imageView)
 		
@@ -81,51 +81,51 @@ class DescriptionCellVeloceViewController: UIViewController {
 		view.addSubview(likeButton)
 		
 		NSLayoutConstraint.activate([
-			likeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 70),
+			likeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
 			likeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
 	//MARK: - Title
-	private let nameCar: UILabel = {
-		let car = UILabel()
-		car.translatesAutoresizingMaskIntoConstraints = false
-		car.textColor = .appBlack
-		car.font = .systemFont(ofSize: ConstantsSize.fontNameCar, weight: .bold)
+	private let nameCarLable: UILabel = {
+		let nameLable = UILabel()
+		nameLable.translatesAutoresizingMaskIntoConstraints = false
+		nameLable.textColor = .appBlack
+		nameLable.font = .systemFont(ofSize: ConstantsSize.fontNameCar, weight: .bold)
 		var incline = CGAffineTransform.identity
 		incline.c = -0.25
-		car.transform = incline
-		return car
+		nameLable.transform = incline
+		return nameLable
 	}()
 	
-	private let teamCar: UILabel = {
-		let team = UILabel()
-		team.translatesAutoresizingMaskIntoConstraints = false
-		team.textColor = .appGreyDark
-		team.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
-		return team
+	private let teamCarLable: UILabel = {
+		let teamLable = UILabel()
+		teamLable.translatesAutoresizingMaskIntoConstraints = false
+		teamLable.textColor = .appGreyDark
+		teamLable.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
+		return teamLable
 	}()
 	
-	private let stackTitle: UIStackView = {
-		let stack = UIStackView()
-		stack.translatesAutoresizingMaskIntoConstraints = false
-		stack.axis = .vertical
-		return stack
+	private let stackTitleView: UIStackView = {
+		let stackView = UIStackView()
+		stackView.translatesAutoresizingMaskIntoConstraints = false
+		stackView.axis = .vertical
+		return stackView
 	}()
 	
 	private func setupTitle() {
-		guard let data = data else { return } // повторюється!
+		guard let viewModel else { return } // повторюється!
 		
-		nameCar.text = data.title
-		teamCar.text = data.subTitle.uppercased()
-		stackTitle.addArrangedSubview(nameCar)
-		stackTitle.addArrangedSubview(teamCar)
-		view.addSubview(stackTitle)
+		nameCarLable.text = viewModel.title
+		teamCarLable.text = viewModel.subTitle.uppercased()
+		stackTitleView.addArrangedSubview(nameCarLable)
+		stackTitleView.addArrangedSubview(teamCarLable)
+		view.addSubview(stackTitleView)
 		
 		NSLayoutConstraint.activate([
-			stackTitle.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 80),
-			stackTitle.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			stackTitle.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			stackTitleView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+			stackTitleView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			stackTitleView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -140,13 +140,13 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}()
 	
 	private func setupdescription() {
-		guard let data = data else { return }
+		guard let viewModel else { return }
 		
-		descriptionCar.text = data.description
+		descriptionCar.text = viewModel.description
 		view.addSubview(descriptionCar)
 		
 		NSLayoutConstraint.activate([
-			descriptionCar.topAnchor.constraint(equalTo: stackTitle.bottomAnchor, constant: 24),
+			descriptionCar.topAnchor.constraint(equalTo: stackTitleView.bottomAnchor, constant: 24),
 			descriptionCar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			descriptionCar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])

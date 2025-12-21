@@ -19,26 +19,71 @@ class MainVeloceViewController: UIViewController {
 		static let cornerRadius: CGFloat = imageWidthAnchor / 2
 	}
 	
-	private var baseProvider = Base()
-	private lazy var dataCars: [CarModel] = baseProvider.baseCar
-	
-	private lazy var listCellModel: [CollectionViewCellModel] = dataCars.map { model in
-		CollectionViewCellModel(
-			id: model.id,
-			image: model.image,
-			title: model.name,
-			subTitle: model.team
+	lazy var baseCar: [CarModel] = [
+		CarModel(
+			id: "1welkmcs",
+			image: UIImage(named: "Red Bull RB20") ?? UIImage(systemName: "car.fill")!,
+			name: "RB20",
+			team: "Red Bull Racing",
+			description: "The RB20 represents an evolution of its dominant predecessor, featuring aggressive sidepod and engine cover changes aimed at maximizing ground effect efficiency and top speed. It retains the philosophy of minimizing aerodynamic drag while providing exceptional stability.",
+			maxSpeed: 348,
+			acceleration: 2.3,
+			weight: 798
+		),
+		CarModel(
+			id: "1welkmddcs",
+			image: UIImage(named: "Ferrari SF-24") ?? UIImage(systemName: "car.fill")!,
+			name: "SF-24",
+			team: "Scuderia Ferrari",
+			description: "The SF-24 is designed to be a significant departure from its predecessor, featuring a completely redesigned chassis and aerodynamic package. The focus was on making the car more consistent and easier to handle across different tracks and tyre compounds.",
+			maxSpeed: 345,
+			acceleration: 2.4,
+			weight: 798
+		),
+		CarModel(
+			id: "dsfs",
+			image: UIImage(named: "Mercedes W15") ?? UIImage(systemName: "car.fill")!,
+			name: "W15",
+			team: "Mercedes-AMG PETRONAS",
+			description: "The W15 marks a return to a more conventional design philosophy after the team struggled with the zero sidepod concept. It features a new chassis and revised gearbox casing, aiming to establish a more stable foundation for aerodynamic development throughout the season.",
+			maxSpeed: 347,
+			acceleration: 2.4,
+			weight: 798
+		),
+		CarModel(
+			id: "324fdswfd",
+			image: UIImage(named: "McLaren MCL38") ?? UIImage(systemName: "car.fill")!,
+			name: "MCL38",
+			team: "McLaren Formula 1 Team",
+			description: "The MCL38 is a refinement of the aggressive upgrade package introduced mid-season last year. The focus is on improving low-speed corner performance and optimizing the cooling systems for sustained high performance.",
+			maxSpeed: 342,
+			acceleration: 2.5,
+			weight: 798
+		),
+		CarModel(
+			id: "dv",
+			image: UIImage(named: "Alpine A524") ?? UIImage(systemName: "car.fill")!,
+			name: "A524",
+			team: "Alpine F1 Team",
+			description: "The A524 features a new chassis and suspension layout aimed at providing a wider operating window for the car's aerodynamics. It represents a long-term development push to return to the front of the midfield.",
+			maxSpeed: 338,
+			acceleration: 2.6,
+			weight: 798
 		)
-	}
-
-	private let searchController = UISearchBar()
-	private lazy var filterListCollectionCell: [CollectionViewCellModel] = listCellModel
+	]
+	
+	private lazy var dataCars: [CarModel] = baseCar
+	
+	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCar).items
+	
+	private lazy var searchController = UISearchBar()
+	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		navigationController?.setNavigationBarHidden(true, animated: false)
-		filterListCollectionCell = listCellModel
+		filterDataCars = listCellModel
 		
 		setupHeader()
 		setupSearch()
@@ -46,7 +91,7 @@ class MainVeloceViewController: UIViewController {
 	}
 	
 	//MARK: - Header
-	private let titleLable: UILabel = {
+	private let Label: UILabel = {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
 		title.textColor = .appBlack
@@ -58,6 +103,7 @@ class MainVeloceViewController: UIViewController {
 		return title
 	}()
 	
+	// А тут як краще назвати?)
 	private let subTitleLable: UILabel = {
 		let subTitle = UILabel()
 		subTitle.translatesAutoresizingMaskIntoConstraints = false
@@ -77,7 +123,7 @@ class MainVeloceViewController: UIViewController {
 	}()
 	
 	private func setupHeader() {
-		stackTitleView.addArrangedSubview(titleLable)
+		stackTitleView.addArrangedSubview(Label)
 		stackTitleView.addArrangedSubview(subTitleLable)
 		view.addSubview(stackTitleView)
 		
@@ -126,21 +172,21 @@ class MainVeloceViewController: UIViewController {
 	
 	private func filterSearchController(with searchText: String) {
 		guard !searchText.isEmpty else {
-			filterListCollectionCell = listCellModel
-			layotCollectionView.reloadData()
+			filterDataCars = listCellModel
+			layoutView.reloadData()
 			return
 		}
 		
 		// title subtitle
-		filterListCollectionCell = listCellModel.filter { item in
+		filterDataCars = listCellModel.filter { item in
 			return item.title.lowercased().contains(searchText.lowercased()) || item.subTitle.lowercased().contains(searchText.lowercased())
 		}
 		
-		layotCollectionView.reloadData()
+		layoutView.reloadData()
 	}
 	
 	//MARK: - Collection
-	private let layotCollectionView: UICollectionView = {
+	private let layoutView: UICollectionView = {
 		let layot = UICollectionViewFlowLayout()
 		layot.scrollDirection = .vertical
 		layot.estimatedItemSize = .zero
@@ -151,16 +197,16 @@ class MainVeloceViewController: UIViewController {
 	}()
 	
 	private func setupCollection() {
-		view.addSubview(layotCollectionView)
-		layotCollectionView.dataSource = self
-		layotCollectionView.delegate = self
-		layotCollectionView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.reuseId)
+		view.addSubview(layoutView)
+		layoutView.dataSource = self
+		layoutView.delegate = self
+		layoutView.register(CollectionCell.self, forCellWithReuseIdentifier: CollectionCell.reuseId)
 		
 		NSLayoutConstraint.activate([
-			layotCollectionView.topAnchor.constraint(equalTo: stackTitleView.bottomAnchor, constant: ConstantsSize.mainIndent),
-			layotCollectionView.bottomAnchor.constraint(equalTo: searchView.topAnchor),
-			layotCollectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-			layotCollectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent)
+			layoutView.topAnchor.constraint(equalTo: stackTitleView.bottomAnchor, constant: ConstantsSize.mainIndent),
+			layoutView.bottomAnchor.constraint(equalTo: searchView.topAnchor),
+			layoutView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			layoutView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent)
 		])
 	}
 }
@@ -168,12 +214,12 @@ class MainVeloceViewController: UIViewController {
 //MARK: - Extension
 extension MainVeloceViewController: UICollectionViewDataSource {
 	func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-		filterListCollectionCell.count
+		filterDataCars.count
 	}
 	
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
-		let itemData = filterListCollectionCell [indexPath.item]
+		let itemData = filterDataCars [indexPath.item]
 		cell.configure(with: itemData)
 		return cell
 	}
@@ -181,10 +227,10 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-		let select = filterListCollectionCell [indexPath.item]
-		guard let fullCarModel = dataCars.first(where: { $0.id == select.id }) else { return }
+		let selectedItem = filterDataCars [indexPath.item]
+		guard let fullCarModel = dataCars.first(where: { $0.id == selectedItem.id }) else { return }
 		
-		let detailModel = DetailViewControllerModel(
+		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
 			image: fullCarModel.image,
 			title: fullCarModel.name,
@@ -192,9 +238,9 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 			description: fullCarModel.description
 		)
 
-		let DescriptionCellVeloceViewController = DescriptionCellVeloceViewController()
-		DescriptionCellVeloceViewController.data = detailModel
-		navigationController?.pushViewController(DescriptionCellVeloceViewController, animated: true)
+		let descriptionCellVeloceViewController = DescriptionCellVeloceViewController()
+		descriptionCellVeloceViewController.viewModel = detailModel
+		navigationController?.pushViewController(descriptionCellVeloceViewController, animated: true)
 	}
 }
 

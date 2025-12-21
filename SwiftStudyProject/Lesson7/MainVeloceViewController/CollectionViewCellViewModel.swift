@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct CollectionViewCellModel {
+struct CollectionViewCellViewModel {
 	let id: String
 	let image: UIImage
 	let title: String

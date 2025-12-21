@@ -14,6 +14,6 @@ struct CarModel {
 	let team: String
 	let description: String
 	let maxSpeed: Int
-	let overclockingTo100: Float
-	let Weight: Int
+	let acceleration: Float
+	let weight: Int
 }

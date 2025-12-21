@@ -20,41 +20,41 @@ class CollectionCell: UICollectionViewCell {
 	
 	static let reuseId = "CollectionCell"
 	
-	private let imageCell: UIImageView = {
-		let image = UIImageView()
-		image.translatesAutoresizingMaskIntoConstraints = false
-		image.contentMode = .scaleAspectFill
-		image.layer.cornerRadius = ConstantsSize.cornerRadius
-		image.clipsToBounds = true
-		return image
+	private let imageView: UIImageView = {
+		let imageView = UIImageView()
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.contentMode = .scaleAspectFill
+		imageView.layer.cornerRadius = ConstantsSize.cornerRadius
+		imageView.clipsToBounds = true
+		return imageView
 	}()
 	
-	private let titleCell: UILabel = {
-		let title = UILabel()
-		title.translatesAutoresizingMaskIntoConstraints = false
-		title.textColor = .appBlack
-		title.font = .systemFont(ofSize: ConstantsSize.fontTitle, weight: .medium)
-		title.numberOfLines = 0
-		return title
+	private let titleLabel: UILabel = {
+		let titleLabel = UILabel()
+		titleLabel.translatesAutoresizingMaskIntoConstraints = false
+		titleLabel.textColor = .appBlack
+		titleLabel.font = .systemFont(ofSize: ConstantsSize.fontTitle, weight: .medium)
+		titleLabel.numberOfLines = 0
+		return titleLabel
 	}()
 	
-	private let subTitleCell: UILabel = {
-		let sub = UILabel()
-		sub.translatesAutoresizingMaskIntoConstraints = false
-		sub.textColor = .appGreyDark
-		sub.font = .systemFont(ofSize: ConstantsSize.fontSubTitle, weight: .medium)
-		sub.numberOfLines = 0
-		return sub
+	private let subtitleLabel: UILabel = {
+		let subtitleLabel = UILabel()
+		subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+		subtitleLabel.textColor = .appGreyDark
+		subtitleLabel.font = .systemFont(ofSize: ConstantsSize.fontSubTitle, weight: .medium)
+		subtitleLabel.numberOfLines = 0
+		return subtitleLabel
 	}()
 	
 	private let stackView: UIStackView = {
-		let stack = UIStackView()
-		stack.translatesAutoresizingMaskIntoConstraints = false
-		stack.axis = .vertical
-		stack.alignment = .fill
-		stack.distribution = .fill
-		stack.spacing = ConstantsSize.spacing
-		return stack
+		let stackView = UIStackView()
+		stackView.translatesAutoresizingMaskIntoConstraints = false
+		stackView.axis = .vertical
+		stackView.alignment = .fill
+		stackView.distribution = .fill
+		stackView.spacing = ConstantsSize.spacing
+		return stackView
 	}()
 	
 	override init(frame: CGRect) {
@@ -68,13 +68,13 @@ class CollectionCell: UICollectionViewCell {
 	
 	private func setupView() {
 		contentView.addSubview(stackView)
-		stackView.addArrangedSubview(imageCell)
-		stackView.addArrangedSubview(titleCell)
-		stackView.addArrangedSubview(subTitleCell)
+		stackView.addArrangedSubview(imageView)
+		stackView.addArrangedSubview(titleLabel)
+		stackView.addArrangedSubview(subtitleLabel)
 		contentView.clipsToBounds = true
 		
 		NSLayoutConstraint.activate([
-			imageCell.heightAnchor.constraint(equalToConstant: ConstantsSize.heightView),
+			imageView.heightAnchor.constraint(equalToConstant: ConstantsSize.heightView),
 			
 			stackView.topAnchor.constraint(equalTo: self.topAnchor),
 			stackView.leadingAnchor.constraint(equalTo: self.leadingAnchor),
@@ -83,9 +83,9 @@ class CollectionCell: UICollectionViewCell {
 		])
 	}
 	
-	func configure(with item: CollectionViewCellModel) {
-		imageCell.image = item.image
-		titleCell.text = item.title
-		subTitleCell.text = item.subTitle.uppercased()
+	func configure(with item: CollectionViewCellViewModel) {
+		imageView.image = item.image
+		titleLabel.text = item.title
+		subtitleLabel.text = item.subTitle.uppercased()
 	}
 }
