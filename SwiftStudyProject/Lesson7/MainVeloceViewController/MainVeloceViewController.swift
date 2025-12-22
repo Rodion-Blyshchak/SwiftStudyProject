@@ -103,8 +103,7 @@ class MainVeloceViewController: UIViewController {
 		return title
 	}()
 	
-	// А тут як краще назвати?)
-	private let subTitleLable: UILabel = {
+	private let subTitleLabel: UILabel = {
 		let subTitle = UILabel()
 		subTitle.translatesAutoresizingMaskIntoConstraints = false
 		subTitle.textColor = .appGreyDark
@@ -124,7 +123,7 @@ class MainVeloceViewController: UIViewController {
 	
 	private func setupHeader() {
 		stackTitleView.addArrangedSubview(Label)
-		stackTitleView.addArrangedSubview(subTitleLable)
+		stackTitleView.addArrangedSubview(subTitleLabel)
 		view.addSubview(stackTitleView)
 		
 		NSLayoutConstraint.activate([

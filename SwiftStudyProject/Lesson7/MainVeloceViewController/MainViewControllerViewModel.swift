@@ -11,7 +11,7 @@ struct MainViewControllerViewModel {
 	let items: [CollectionViewCellViewModel]
 	
 	init(dataCars: [CarModel]) {
-		self.items = dataCars.map { model in
+		items = dataCars.map { model in
 			CollectionViewCellViewModel(
 				id: model.id,
 				image: model.image,

@@ -87,7 +87,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	//MARK: - Title
-	private let nameCarLable: UILabel = {
+	private let nameCarLabel: UILabel = {
 		let nameLable = UILabel()
 		nameLable.translatesAutoresizingMaskIntoConstraints = false
 		nameLable.textColor = .appBlack
@@ -98,7 +98,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return nameLable
 	}()
 	
-	private let teamCarLable: UILabel = {
+	private let teamCarLabel: UILabel = {
 		let teamLable = UILabel()
 		teamLable.translatesAutoresizingMaskIntoConstraints = false
 		teamLable.textColor = .appGreyDark
@@ -106,7 +106,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return teamLable
 	}()
 	
-	private let stackTitleView: UIStackView = {
+	private let mainInfoStackView: UIStackView = {
 		let stackView = UIStackView()
 		stackView.translatesAutoresizingMaskIntoConstraints = false
 		stackView.axis = .vertical
@@ -116,16 +116,16 @@ class DescriptionCellVeloceViewController: UIViewController {
 	private func setupTitle() {
 		guard let viewModel else { return } // повторюється!
 		
-		nameCarLable.text = viewModel.title
-		teamCarLable.text = viewModel.subTitle.uppercased()
-		stackTitleView.addArrangedSubview(nameCarLable)
-		stackTitleView.addArrangedSubview(teamCarLable)
-		view.addSubview(stackTitleView)
+		nameCarLabel.text = viewModel.title
+		teamCarLabel.text = viewModel.subTitle.uppercased()
+		mainInfoStackView.addArrangedSubview(nameCarLabel)
+		mainInfoStackView.addArrangedSubview(teamCarLabel)
+		view.addSubview(mainInfoStackView)
 		
 		NSLayoutConstraint.activate([
-			stackTitleView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
-			stackTitleView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			stackTitleView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			mainInfoStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -146,7 +146,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		view.addSubview(descriptionCar)
 		
 		NSLayoutConstraint.activate([
-			descriptionCar.topAnchor.constraint(equalTo: stackTitleView.bottomAnchor, constant: 24),
+			descriptionCar.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
 			descriptionCar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			descriptionCar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
