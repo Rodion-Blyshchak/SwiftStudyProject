@@ -131,22 +131,29 @@ class MainVeloceViewController: UIViewController {
 			stackTitleView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent)
 		])
 		
-		let userButton = UIButton()
-		let buttonImage = UIImage(named: "User")?.withRenderingMode(.alwaysTemplate)
-		userButton.setImage(buttonImage, for: .normal)
-		userButton.tintColor = .appBlack
-		userButton.translatesAutoresizingMaskIntoConstraints = false
-		userButton.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
-		userButton.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
-		userButton.layer.cornerRadius = ConstantsSize.cornerRadius
-		userButton.layer.borderWidth = 1.0
-		userButton.layer.borderColor = UIColor(named: "appGreyDark")?.cgColor
-		view.addSubview(userButton)
+		let createNewCardButton = UIButton()
+		let buttonImage = UIImage(named: "addButton")?.withRenderingMode(.alwaysTemplate)
+		createNewCardButton.setImage(buttonImage, for: .normal)
+		createNewCardButton.tintColor = .appBlack
+		createNewCardButton.translatesAutoresizingMaskIntoConstraints = false
+		createNewCardButton.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
+		createNewCardButton.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		createNewCardButton.layer.cornerRadius = ConstantsSize.cornerRadius
+		createNewCardButton.layer.borderWidth = 1.0
+		createNewCardButton.layer.borderColor = UIColor(named: "appGreyDark")?.cgColor
+		createNewCardButton.addTarget(self, action: #selector(addNewCrad), for: .touchUpInside)
+		view.addSubview(createNewCardButton)
 		
 		NSLayoutConstraint.activate([
-			userButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: ConstantsSize.mainIndent),
-			userButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			createNewCardButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: ConstantsSize.mainIndent),
+			createNewCardButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
+	}
+	
+	@objc private func addNewCrad() {
+		let AddCarViewController = AddCarViewController()
+		AddCarViewController.modalPresentationStyle = .pageSheet
+		self.present(AddCarViewController, animated: true)
 	}
 	
 	//MARK: - Search

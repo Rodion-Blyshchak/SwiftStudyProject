@@ -17,6 +17,8 @@
 					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
 					<key>UISceneStoryboardFile</key>
 					<string>Main</string>
+					<key>Privacy - Camera Usage Description</key>
+					<string>Camera access</string>
 				</dict>
 			</array>
 		</dict>
