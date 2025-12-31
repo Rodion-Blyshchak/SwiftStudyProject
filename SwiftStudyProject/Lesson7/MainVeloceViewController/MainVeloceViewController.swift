@@ -151,9 +151,10 @@ class MainVeloceViewController: UIViewController {
 	}
 	
 	@objc private func addNewCrad() {
-		let AddCarViewController = AddCarViewController()
-		AddCarViewController.modalPresentationStyle = .pageSheet
-		self.present(AddCarViewController, animated: true)
+		let addCarViewController = AddCarViewController()
+		addCarViewController.delegate = self
+		addCarViewController.modalPresentationStyle = .pageSheet
+		self.present(addCarViewController, animated: true)
 	}
 	
 	//MARK: - Search
@@ -262,5 +263,31 @@ extension MainVeloceViewController: UICollectionViewDelegateFlowLayout {
 extension MainVeloceViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		filterSearchController(with: searchText)
+	}
+}
+
+extension MainVeloceViewController: AddCarViewDelegate {
+	func didAddNewCar(car: ViewNewCellViewModel) {
+		let detailModel = CollectionViewCellViewModel(
+			id: car.id,
+			image: car.image,
+			title: car.brand,
+			subTitle: car.model
+		)
+		let fullCarModel = CarModel(
+			id: car.id,
+			image: car.image,
+			name: car.brand,
+			team: car.model,
+			description: car.description,
+			maxSpeed: 0,
+			acceleration: Float(car.acceleration) ?? 0.0,
+			weight: Int(car.weight) ?? 0
+		)
+		
+		self.dataCars.append(fullCarModel)
+		self.listCellModel.append(detailModel)
+		self.filterDataCars = listCellModel
+		self.layoutView.reloadData()
 	}
 }

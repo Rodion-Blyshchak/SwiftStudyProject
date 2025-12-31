@@ -7,7 +7,39 @@
 
 import UIKit
 
+protocol AddCarViewDelegate {
+	func didAddNewCar(car: ViewNewCellViewModel)
+}
+
 class AddCarViewController: UIViewController {
+	var delegate: AddCarViewDelegate?
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		view.backgroundColor = .appWhite
+		headerSetupStack()
+		setupStack()
+	}
+	
+	//MARK: - Header stack
+	private func headerButton(color: UIColor, text: String, addTarget: Selector) -> UIButton {
+		let button = UIButton()
+		button.heightAnchor.constraint(equalToConstant: 35).isActive = true
+		button.widthAnchor.constraint(equalToConstant: 90).isActive = true
+		button.layer.cornerRadius = 8
+		button.backgroundColor = color
+		button.setTitle(text, for: .normal)
+		button.setTitleColor(.white, for: .normal)
+		button.addTarget(self, action: addTarget, for: .touchUpInside)
+		return button
+	}
+	@objc private func closeScreen() {
+		self.dismiss(animated: true)
+	}
+	
+	private lazy var cancelButton = headerButton(color: .appGreyDark, text: "Cancel", addTarget: #selector(closeScreen))
+	private lazy var addCardButton = headerButton(color: .appBlue, text: "Add", addTarget: #selector(didAddTapNewCard))
+	
 	private lazy var topStrip: UIView = {
 		let strip = UIView()
 		strip.translatesAutoresizingMaskIntoConstraints = false
@@ -18,19 +50,27 @@ class AddCarViewController: UIViewController {
 		return strip
 	}()
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		view.backgroundColor = .appWhite
-		setupStrip()
-		setupStack()
-	}
+	private lazy var headerStackView: UIStackView = {
+		let stack = UIStackView()
+		stack.translatesAutoresizingMaskIntoConstraints = false
+		stack.axis = .horizontal
+		stack.alignment = .top
+		stack.distribution = .equalSpacing
+		stack.spacing = 10
+		return stack
+	}()
 	
-	private func setupStrip() {
-		view.addSubview(topStrip)
+	private func headerSetupStack() {
+		headerStackView.addArrangedSubview(cancelButton)
+		headerStackView.addArrangedSubview(topStrip)
+		headerStackView.addArrangedSubview(addCardButton)
+		
+		view.addSubview(headerStackView)
 		
 		NSLayoutConstraint.activate([
-			topStrip.topAnchor.constraint(equalTo: view.topAnchor, constant: 8),
-			topStrip.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+			headerStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: 20),
+			headerStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
+			headerStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
 		])
 	}
 	
@@ -38,7 +78,7 @@ class AddCarViewController: UIViewController {
 	private lazy var imageView: UIImageView = {
 		let image = UIImageView()
 		image.translatesAutoresizingMaskIntoConstraints = false
-		image.heightAnchor.constraint(equalToConstant: 120).isActive = true
+		image.heightAnchor.constraint(equalToConstant: 200).isActive = true
 		image.contentMode = .scaleAspectFill
 		image.clipsToBounds = true
 		image.layer.cornerRadius = 8
@@ -47,6 +87,7 @@ class AddCarViewController: UIViewController {
 		return image
 	}()
 	
+	//MARK: - Func didTapAddPhoto
 	@objc private func didTapAddPhoto() {
 		let picker = UIImagePickerController()
 		picker.delegate = self
@@ -114,25 +155,14 @@ class AddCarViewController: UIViewController {
 		let description = UITextView()
 		description.translatesAutoresizingMaskIntoConstraints = false
 		description.backgroundColor = .appLight
-		description.textColor = .appBlack
-		description.layer.cornerRadius = 8
 		description.text = "Description"
-		description.font = .systemFont(ofSize: 16)
-		description.textColor = .lightGray
+		description.textColor = .placeholderText
+		description.layer.cornerRadius = 8
+		description.textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+		description.font = .systemFont(ofSize: 18)
 		description.delegate = self
 		description.returnKeyType = .done
 		return description
-	}()
-	
-	private lazy var addCardButton: UIButton = {
-		let button = UIButton()
-		button.heightAnchor.constraint(equalToConstant: 40).isActive = true
-		button.layer.cornerRadius = 8
-		button.backgroundColor = .appBlue
-		button.setTitle("Add", for: .normal)
-		button.setTitleColor(.appBlack, for: .normal)
-//		button.addTarget(self, action: #selector(didTapAddPhoto), for: .touchUpInside)
-		return button
 	}()
 	
 	private lazy var stackView: UIStackView = {
@@ -153,16 +183,41 @@ class AddCarViewController: UIViewController {
 		stackView.addArrangedSubview(accelerationTextField)
 		stackView.addArrangedSubview(weightTextField)
 		stackView.addArrangedSubview(descriptionTextField)
-		stackView.addArrangedSubview(addCardButton)
 		
 		view.addSubview(stackView)
 		
 		NSLayoutConstraint.activate([
-			stackView.topAnchor.constraint(equalTo: topStrip.bottomAnchor, constant: 20),
+			stackView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: 20),
 			stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
 			stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
 			stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
 		])
+	}
+	
+	//MARK: - Func addNewCard
+	private func addNewCard() -> [ViewNewCellViewModel] {
+		let description = (descriptionTextField.textColor == .lightGray) ? "" : (descriptionTextField.text ?? "")
+		
+		let newCardModel = ViewNewCellViewModel(
+			id: UUID().uuidString,
+			brand: brandTextField.text ?? "",
+			model: modelTextField.text ?? "",
+			acceleration: accelerationTextField.text ?? "",
+			weight: weightTextField.text ?? "",
+			description: description,
+			image: imageView.image ?? UIImage(named: "Neon orange glasses on silhouette profile")!
+		)
+		
+		return [newCardModel]
+	}
+	
+	@objc private func didAddTapNewCard() {
+		let newCards = addNewCard()
+		
+		if let newCard = newCards.first {
+			delegate?.didAddNewCar(car: newCard)
+		}
+		closeScreen()
 	}
 }
 
@@ -170,14 +225,14 @@ class AddCarViewController: UIViewController {
 // TextField
 extension AddCarViewController: UITextFieldDelegate {
 	func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-		if textField == brandTextField {
-			modelTextField.becomeFirstResponder()
-		} else if textField == modelTextField {
-			accelerationTextField.becomeFirstResponder()
-		} else if textField == accelerationTextField {
-			weightTextField.becomeFirstResponder()
-		} else if textField == weightTextField {
-			descriptionTextField.becomeFirstResponder()
+		let textFields: [UITextField] = [brandTextField, modelTextField, accelerationTextField, weightTextField]
+		
+		if let curentIndex = textFields.firstIndex(of: textField) {
+			if curentIndex < textFields.count - 1 {
+				textFields[curentIndex + 1].becomeFirstResponder()
+			} else {
+				descriptionTextField.becomeFirstResponder()
+			}
 		}
 		return true
 	}
@@ -185,16 +240,9 @@ extension AddCarViewController: UITextFieldDelegate {
 
 extension AddCarViewController: UITextViewDelegate {
 	func textViewDidChange(_ textView: UITextView) {
-		if textView.textColor == .lightGray {
+		if textView.textColor == .placeholderText {
 			textView.text = nil
 			textView.textColor = .appBlack
-		}
-	}
-	
-	func textViewDidEndEditing(_ textView: UITextView) {
-		if textView.text.isEmpty {
-			textView.text = "Description"
-			textView.textColor = .lightGray
 		}
 	}
 	
@@ -219,8 +267,6 @@ extension AddCarViewController: UIImagePickerControllerDelegate {
 	func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
 		picker.dismiss(animated: true)
 	}
-	
-	
 }
 
 extension AddCarViewController: UINavigationControllerDelegate {
