@@ -72,6 +72,7 @@ class MainVeloceViewController: UIViewController {
 		)
 	]
 	
+	//MARK: - Properties
 	private lazy var dataCars: [CarModel] = baseCar
 	
 	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCar).items
@@ -79,19 +80,7 @@ class MainVeloceViewController: UIViewController {
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		view.backgroundColor = .appWhite
-		navigationController?.setNavigationBarHidden(true, animated: false)
-		filterDataCars = listCellModel
-		
-		setupHeader()
-		setupSearch()
-		setupCollection()
-	}
-	
-	//MARK: - Header
-	private let Label: UILabel = {
+	private lazy var Label: UILabel = {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
 		title.textColor = .appBlack
@@ -103,7 +92,7 @@ class MainVeloceViewController: UIViewController {
 		return title
 	}()
 	
-	private let subTitleLabel: UILabel = {
+	private lazy var subTitleLabel: UILabel = {
 		let subTitle = UILabel()
 		subTitle.translatesAutoresizingMaskIntoConstraints = false
 		subTitle.textColor = .appGreyDark
@@ -113,7 +102,7 @@ class MainVeloceViewController: UIViewController {
 		return subTitle
 	}()
 	
-	private let stackTitleView: UIStackView = {
+	private lazy var stackTitleView: UIStackView = {
 		let stack = UIStackView()
 		stack.translatesAutoresizingMaskIntoConstraints = false
 		stack.axis = .vertical
@@ -121,7 +110,65 @@ class MainVeloceViewController: UIViewController {
 		return stack
 	}()
 	
-	private func setupHeader() {
+	private lazy var searchView: UISearchBar = {
+		let search = searchController
+		search.translatesAutoresizingMaskIntoConstraints = false
+		search.placeholder = "Search"
+		search.searchBarStyle = .minimal
+		return search
+	}()
+	
+	private lazy var layoutView: UICollectionView = {
+		let layot = UICollectionViewFlowLayout()
+		layot.scrollDirection = .vertical
+		layot.estimatedItemSize = .zero
+		layot.minimumLineSpacing = ConstantsSize.mainIndent
+		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layot)
+		collectionView.translatesAutoresizingMaskIntoConstraints = false
+		return collectionView
+	}()
+	
+	//MARK: - ViewDidLoad
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		view.backgroundColor = .appWhite
+		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
+		tapOutsideKeyboard.cancelsTouchesInView = false
+		view.addGestureRecognizer(tapOutsideKeyboard)
+		
+		navigationController?.setNavigationBarHidden(true, animated: false)
+		filterDataCars = listCellModel
+		
+		setupHeaderView()
+		setupSearchView()
+		setupCollectionView()
+	}
+	
+	//MARK: - Func addNewCrad
+	@objc private func addNewCrad() {
+		let addCarViewController = AddCarViewController()
+		addCarViewController.delegate = self
+		addCarViewController.modalPresentationStyle = .pageSheet
+		self.present(addCarViewController, animated: true)
+	}
+
+	//MARK: - Func filterSearchController
+	private func filterSearchController(with searchText: String) {
+		guard !searchText.isEmpty else {
+			filterDataCars = listCellModel
+			layoutView.reloadData()
+			return
+		}
+		// title subtitle
+		filterDataCars = listCellModel.filter { item in
+			return item.title.lowercased().contains(searchText.lowercased()) || item.subTitle.lowercased().contains(searchText.lowercased())
+		}
+		
+		layoutView.reloadData()
+	}
+	
+	//MARK: - StacksView
+	private func setupHeaderView() {
 		stackTitleView.addArrangedSubview(Label)
 		stackTitleView.addArrangedSubview(subTitleLabel)
 		view.addSubview(stackTitleView)
@@ -150,23 +197,7 @@ class MainVeloceViewController: UIViewController {
 		])
 	}
 	
-	@objc private func addNewCrad() {
-		let addCarViewController = AddCarViewController()
-		addCarViewController.delegate = self
-		addCarViewController.modalPresentationStyle = .pageSheet
-		self.present(addCarViewController, animated: true)
-	}
-	
-	//MARK: - Search
-	private lazy var searchView: UISearchBar = {
-		let search = searchController
-		search.translatesAutoresizingMaskIntoConstraints = false
-		search.placeholder = "Search"
-		search.searchBarStyle = .minimal
-		return search
-	}()
-	
-	private func setupSearch() {
+	private func setupSearchView() {
 		searchView.delegate = self
 		view.addSubview(searchView)
 		
@@ -176,34 +207,9 @@ class MainVeloceViewController: UIViewController {
 			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
+
 	
-	private func filterSearchController(with searchText: String) {
-		guard !searchText.isEmpty else {
-			filterDataCars = listCellModel
-			layoutView.reloadData()
-			return
-		}
-		
-		// title subtitle
-		filterDataCars = listCellModel.filter { item in
-			return item.title.lowercased().contains(searchText.lowercased()) || item.subTitle.lowercased().contains(searchText.lowercased())
-		}
-		
-		layoutView.reloadData()
-	}
-	
-	//MARK: - Collection
-	private let layoutView: UICollectionView = {
-		let layot = UICollectionViewFlowLayout()
-		layot.scrollDirection = .vertical
-		layot.estimatedItemSize = .zero
-		layot.minimumLineSpacing = ConstantsSize.mainIndent
-		let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layot)
-		collectionView.translatesAutoresizingMaskIntoConstraints = false
-		return collectionView
-	}()
-	
-	private func setupCollection() {
+	private func setupCollectionView() {
 		view.addSubview(layoutView)
 		layoutView.dataSource = self
 		layoutView.delegate = self
@@ -264,28 +270,22 @@ extension MainVeloceViewController: UISearchBarDelegate {
 	func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
 		filterSearchController(with: searchText)
 	}
+	
+	func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+		searchBar.resignFirstResponder()
+	}
 }
 
 extension MainVeloceViewController: AddCarViewDelegate {
-	func didAddNewCar(car: ViewNewCellViewModel) {
+	func didAddNewCar(car: CarModel) {
 		let detailModel = CollectionViewCellViewModel(
 			id: car.id,
 			image: car.image,
-			title: car.brand,
-			subTitle: car.model
-		)
-		let fullCarModel = CarModel(
-			id: car.id,
-			image: car.image,
-			name: car.brand,
-			team: car.model,
-			description: car.description,
-			maxSpeed: 0,
-			acceleration: Float(car.acceleration) ?? 0.0,
-			weight: Int(car.weight) ?? 0
+			title: car.name,
+			subTitle: car.team
 		)
 		
-		self.dataCars.append(fullCarModel)
+		self.dataCars.append(car)
 		self.listCellModel.append(detailModel)
 		self.filterDataCars = listCellModel
 		self.layoutView.reloadData()
