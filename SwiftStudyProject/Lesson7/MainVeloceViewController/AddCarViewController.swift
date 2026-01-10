@@ -25,8 +25,18 @@ class AddCarViewController: UIViewController {
 	//MARK: - Properties
 	var delegate: AddCarViewDelegate?
 	
+	private lazy var scrollView = UIScrollView()
 	private lazy var cancelButton = UIButton()
 	private lazy var addCardButton = UIButton()
+	
+	private lazy var keyboardScrollHelper = NotificationKeyboard { height, isOn in
+//		guard isOn else { return }
+		
+		self.scrollView.contentInset.bottom = height
+		self.scrollView.verticalScrollIndicatorInsets.bottom = height
+		
+		self.scrollToActiveField()
+	}
 
 	private lazy var topStrip: UIView = {
 		let strip = UIView()
@@ -87,6 +97,8 @@ class AddCarViewController: UIViewController {
 		description.font = .systemFont(ofSize: ConstantsSize.font)
 		description.delegate = self
 		description.returnKeyType = .done
+		// Як тут зробити висоту descr у всю висоту вільного екрану, так як це буде дл scrollView?
+		description.heightAnchor.constraint(equalToConstant: 200).isActive = true
 		return description
 	}()
 	
@@ -106,7 +118,9 @@ class AddCarViewController: UIViewController {
 		view.backgroundColor = .appWhite
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
 		view.addGestureRecognizer(tapOutsideKeyboard)
+		_ = keyboardScrollHelper
 		
+		setupScrollView()
 		setupHeaderButton()
 		setupTextField()
 		setupHeaderStackView()
@@ -115,6 +129,14 @@ class AddCarViewController: UIViewController {
 	
 	@objc private func closeScreen() {
 		self.dismiss(animated: true)
+	}
+	
+	//MARK: - Func scrollToActiveField
+	private func scrollToActiveField() {
+		let allViews = stackView.arrangedSubviews
+		if let activeView = allViews.first(where: { $0.isFirstResponder }) {
+			scrollView.scrollRectToVisible(activeView.frame, animated: true)
+		}
 	}
 	
 	//MARK: - Func didTapAddPhoto
@@ -205,17 +227,29 @@ class AddCarViewController: UIViewController {
 	}
 	
 	//MARK: - StacksView
+	private func setupScrollView() {
+		scrollView.translatesAutoresizingMaskIntoConstraints = false
+		view.addSubview(scrollView)
+		
+		NSLayoutConstraint.activate([
+			scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+			scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+			scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+		])
+	}
+	
 	private func setupHeaderStackView() {
 		headerStackView.addArrangedSubview(cancelButton)
 		headerStackView.addArrangedSubview(topStrip)
 		headerStackView.addArrangedSubview(addCardButton)
 		
-		view.addSubview(headerStackView)
+		scrollView.addSubview(headerStackView)
 		
 		NSLayoutConstraint.activate([
-			headerStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: ConstantsSize.mainTopIndent),
-			headerStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			headerStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			headerStackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: ConstantsSize.mainTopIndent),
+			headerStackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: ConstantsSize.mainIndent),
+			headerStackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -228,13 +262,13 @@ class AddCarViewController: UIViewController {
 		stackView.addArrangedSubview(weightTextField)
 		stackView.addArrangedSubview(descriptionTextField)
 		
-		view.addSubview(stackView)
+		scrollView.addSubview(stackView)
 		
 		NSLayoutConstraint.activate([
 			stackView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: ConstantsSize.mainTopIndent),
-			stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-			stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+			stackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: ConstantsSize.mainIndent),
+			stackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
 		])
 	}
 }
