@@ -17,6 +17,7 @@ class MainVeloceViewController: UIViewController {
 		static let fontTitle: CGFloat = 32
 		static let fontSubTitle: CGFloat = 16
 		static let cornerRadius: CGFloat = imageWidthAnchor / 2
+		static let spacing: CGFloat = 4
 	}
 	
 	lazy var baseCar: [CarModel] = [
@@ -28,7 +29,8 @@ class MainVeloceViewController: UIViewController {
 			description: "The RB20 represents an evolution of its dominant predecessor, featuring aggressive sidepod and engine cover changes aimed at maximizing ground effect efficiency and top speed. It retains the philosophy of minimizing aerodynamic drag while providing exceptional stability.",
 			maxSpeed: 348,
 			acceleration: 2.3,
-			weight: 798
+			weight: 798,
+			
 		),
 		CarModel(
 			id: "1welkmddcs",
@@ -80,6 +82,18 @@ class MainVeloceViewController: UIViewController {
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
 	
+	private var searchViewBottomConstraint: NSLayoutConstraint?
+	
+	private lazy var keyboardScrollHelper = NotificationKeyboard { height, isOn in
+		self.searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
+		
+		UIView.animate(withDuration: 0.3) {
+			self.view.layoutIfNeeded()
+		}
+	}
+	
+	private lazy var favoriteStatus = false
+	
 	private lazy var Label: UILabel = {
 		let title = UILabel()
 		title.translatesAutoresizingMaskIntoConstraints = false
@@ -106,7 +120,28 @@ class MainVeloceViewController: UIViewController {
 		let stack = UIStackView()
 		stack.translatesAutoresizingMaskIntoConstraints = false
 		stack.axis = .vertical
-		stack.spacing = 4
+		stack.spacing = ConstantsSize.spacing
+		return stack
+	}()
+	
+	private lazy var favoriteFilterButton = UIButton()
+	private lazy var createNewCardButton = UIButton()
+	
+	private lazy var stackButtonView: UIStackView = {
+		let stack = UIStackView()
+		stack.translatesAutoresizingMaskIntoConstraints = false
+		stack.axis = .horizontal
+		stack.spacing = ConstantsSize.mainIndent
+		return stack
+	}()
+	
+	private lazy var stackHeaderView: UIStackView = {
+		let stack = UIStackView()
+		stack.translatesAutoresizingMaskIntoConstraints = false
+		stack.axis = .horizontal
+		stack.spacing = ConstantsSize.spacing
+		stack.distribution = .equalSpacing
+		stack.alignment = .center
 		return stack
 	}()
 	
@@ -139,9 +174,54 @@ class MainVeloceViewController: UIViewController {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
+		_ = keyboardScrollHelper
+		
+		setupHeaderButton()
 		setupHeaderView()
 		setupSearchView()
 		setupCollectionView()
+	}
+	
+	//MARK: - SetupHeaderButton
+	private func setupHeaderButton() {
+		[favoriteFilterButton, createNewCardButton].forEach{ button in
+			button.tintColor = .appBlack
+			button.translatesAutoresizingMaskIntoConstraints = false
+			button.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
+			button.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+			button.layer.cornerRadius = ConstantsSize.cornerRadius
+			button.layer.borderWidth = 1.0
+			button.layer.borderColor = UIColor(named: "appGreyDark")?.cgColor
+		}
+		
+		
+		let favoriteIcon = UIImage(systemName: "heart")?.withRenderingMode(.alwaysTemplate)
+		favoriteFilterButton.setImage(favoriteIcon, for: .normal)
+		favoriteFilterButton.addTarget(self, action: #selector(toggleFavoriteFilter), for: .touchUpInside)
+		
+		let createNewCardIcon = UIImage(named: "addButton")?.withRenderingMode(.alwaysTemplate)
+		createNewCardButton.setImage(createNewCardIcon, for: .normal)
+		createNewCardButton.addTarget(self, action: #selector(addNewCrad), for: .touchUpInside)
+	}
+	
+	//MARK: - FavoriteFFilters
+	@objc private func toggleFavoriteFilter() {
+		favoriteStatus.toggle()
+
+		let imageName = favoriteStatus ? "heart.fill" : "heart"
+		favoriteFilterButton.setImage(UIImage(systemName: imageName), for: .normal)
+
+		favoriteFFilters()
+	}
+	
+	private func favoriteFFilters() {
+		let filteredModels = dataCars.filter{ card in
+			let matchesFavorite = favoriteStatus ? card.favoriteStatus : true
+			return matchesFavorite
+		}
+		
+		filterDataCars = filteredModels.map { CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team) }
+		layoutView.reloadData()
 	}
 	
 	//MARK: - Func addNewCrad
@@ -171,29 +251,18 @@ class MainVeloceViewController: UIViewController {
 	private func setupHeaderView() {
 		stackTitleView.addArrangedSubview(Label)
 		stackTitleView.addArrangedSubview(subTitleLabel)
-		view.addSubview(stackTitleView)
+		
+		stackButtonView.addArrangedSubview(favoriteFilterButton)
+		stackButtonView.addArrangedSubview(createNewCardButton)
+		
+		stackHeaderView.addArrangedSubview(stackTitleView)
+		stackHeaderView.addArrangedSubview(stackButtonView)
+		view.addSubview(stackHeaderView)
 		
 		NSLayoutConstraint.activate([
-			stackTitleView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-			stackTitleView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent)
-		])
-		
-		let createNewCardButton = UIButton()
-		let buttonImage = UIImage(named: "addButton")?.withRenderingMode(.alwaysTemplate)
-		createNewCardButton.setImage(buttonImage, for: .normal)
-		createNewCardButton.tintColor = .appBlack
-		createNewCardButton.translatesAutoresizingMaskIntoConstraints = false
-		createNewCardButton.widthAnchor.constraint(equalToConstant: ConstantsSize.imageWidthAnchor).isActive = true
-		createNewCardButton.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
-		createNewCardButton.layer.cornerRadius = ConstantsSize.cornerRadius
-		createNewCardButton.layer.borderWidth = 1.0
-		createNewCardButton.layer.borderColor = UIColor(named: "appGreyDark")?.cgColor
-		createNewCardButton.addTarget(self, action: #selector(addNewCrad), for: .touchUpInside)
-		view.addSubview(createNewCardButton)
-		
-		NSLayoutConstraint.activate([
-			createNewCardButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: ConstantsSize.mainIndent),
-			createNewCardButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			stackHeaderView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+			stackHeaderView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			stackHeaderView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -201,8 +270,10 @@ class MainVeloceViewController: UIViewController {
 		searchView.delegate = self
 		view.addSubview(searchView)
 		
+		searchViewBottomConstraint = searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+		
 		NSLayoutConstraint.activate([
-			searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+			searchViewBottomConstraint!,
 			searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
@@ -238,10 +309,12 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 	}
 }
 
+	// Тут я щось не впевнений чи норм зробив
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let selectedItem = filterDataCars [indexPath.item]
-		guard let fullCarModel = dataCars.first(where: { $0.id == selectedItem.id }) else { return }
+		guard let index = dataCars.firstIndex(where: { $0.id == selectedItem.id }) else { return }
+		let fullCarModel = dataCars[index]
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
@@ -253,6 +326,16 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 
 		let descriptionCellVeloceViewController = DescriptionCellVeloceViewController()
 		descriptionCellVeloceViewController.viewModel = detailModel
+		descriptionCellVeloceViewController.favoriteStatus = fullCarModel.favoriteStatus
+		
+		descriptionCellVeloceViewController.didTapFavoriteAction = { [weak self] in
+			self?.dataCars[index].favoriteStatus.toggle()
+			
+			let newStatus = self?.dataCars[index].favoriteStatus
+			descriptionCellVeloceViewController.updateFavorite(isFavorite: newStatus ?? false)
+			self?.favoriteFFilters()
+		}
+		
 		navigationController?.pushViewController(descriptionCellVeloceViewController, animated: true)
 	}
 }

@@ -31,7 +31,6 @@ class AddCarViewController: UIViewController {
 	
 	private lazy var keyboardScrollHelper = NotificationKeyboard { height, isOn in
 //		guard isOn else { return }
-		
 		self.scrollView.contentInset.bottom = height
 		self.scrollView.verticalScrollIndicatorInsets.bottom = height
 		
@@ -133,10 +132,11 @@ class AddCarViewController: UIViewController {
 	
 	//MARK: - Func scrollToActiveField
 	private func scrollToActiveField() {
-		let allViews = stackView.arrangedSubviews
-		if let activeView = allViews.first(where: { $0.isFirstResponder }) {
-			scrollView.scrollRectToVisible(activeView.frame, animated: true)
-		}
+		guard let activeView = stackView.arrangedSubviews.first(where: { $0.isFirstResponder}) else { return }
+		let coordinates = stackView.convert(activeView.frame, to: scrollView)
+		let visibleHeight = (scrollView.frame.height - scrollView.contentInset.bottom) - ConstantsSize.mainIndent
+		let offset = CGPoint(x: 0, y: coordinates.maxY - visibleHeight)
+		scrollView.setContentOffset(offset, animated: true)
 	}
 	
 	//MARK: - Func didTapAddPhoto
