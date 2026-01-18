@@ -7,11 +7,15 @@
 
 import UIKit
 
-class NotificationKeyboard {
-	var onKeyboardToggle: ((_ height: CGFloat, _ isOn: Bool) -> Void)?
+protocol NotificationManagerDelegate {
+	func keyboardToggle(height: CGFloat, isOn: Bool)
+}
+
+class NotificationManager {
+	var delegate: NotificationManagerDelegate?
 	
-	init(onKeyboardToggle: ((_: CGFloat, _: Bool) -> Void)? = nil) {
-		self.onKeyboardToggle = onKeyboardToggle
+	init(delegate: NotificationManagerDelegate? = nil) {
+		self.delegate = delegate
 		activatyNotificationKeyboard()
 	}
 	
@@ -24,11 +28,10 @@ class NotificationKeyboard {
 		guard let userInfo = notification.userInfo,
 			  let value = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
 		
-		let height = value.height
-		onKeyboardToggle?(height, true)
+		delegate?.keyboardToggle(height: value.height, isOn: true)
 	}
 	
 	@objc private func keyboardWillHide() {
-		onKeyboardToggle?(0, false)
+		delegate?.keyboardToggle(height: 0, isOn: false)
 	}
 }

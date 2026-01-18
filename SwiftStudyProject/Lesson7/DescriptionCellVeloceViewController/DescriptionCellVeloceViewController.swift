@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol DescriptionCellVeloceViewControllerDelegate {
+	func didTapFavoriteAction(index: Int)
+}
+
 class DescriptionCellVeloceViewController: UIViewController {
 	enum ConstantsSize {
 		static let imageHeightAnchor: CGFloat = 300
@@ -21,6 +25,8 @@ class DescriptionCellVeloceViewController: UIViewController {
 	
 	//MARK: - Properties
 	var viewModel: DetailViewControllerViewModel?
+	var delegate: DescriptionCellVeloceViewControllerDelegate?
+	var itemIndex: Int?
 	
 	private let imageView: UIImageView = {
 		let image = UIImageView()
@@ -56,13 +62,13 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return stackView
 	}()
 	
-	private let descriptionCar: UILabel = {
-		let description = UILabel()
-		description.translatesAutoresizingMaskIntoConstraints = false
-		description.textColor = .appGreyDark
-		description.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
-		description.numberOfLines = 0
-		return description
+	private let carDescriptionLabel: UILabel = {
+		let descriptionLabel = UILabel()
+		descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+		descriptionLabel.textColor = .appGreyDark
+		descriptionLabel.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
+		descriptionLabel.numberOfLines = 0
+		return descriptionLabel
 	}()
 	
 	lazy var favoriteStatus: Bool = false
@@ -144,13 +150,13 @@ class DescriptionCellVeloceViewController: UIViewController {
 	private func setupdescription() {
 		guard let viewModel else { return }
 		
-		descriptionCar.text = viewModel.description
-		view.addSubview(descriptionCar)
+		carDescriptionLabel.text = viewModel.description
+		view.addSubview(carDescriptionLabel)
 		
 		NSLayoutConstraint.activate([
-			descriptionCar.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
-			descriptionCar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			descriptionCar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
+			carDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			carDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -164,13 +170,12 @@ class DescriptionCellVeloceViewController: UIViewController {
 		])
 	}
 	
-	var didTapFavoriteAction: (() -> Void)?
-	
-	@objc func didTapFavorite() {
-		didTapFavoriteAction?()
+	@objc private func didTapFavorite() {
+		guard let index = itemIndex else { return }
+		delegate?.didTapFavoriteAction(index: index)
 	}
 	
-	@objc func updateFavorite(isFavorite: Bool) {
+	func updateFavoriteStatus(isFavorite: Bool) {
 		updateFavoriteButtonState(isFavorite: isFavorite)
 	}
 }

@@ -84,15 +84,8 @@ class MainVeloceViewController: UIViewController {
 	
 	private var searchViewBottomConstraint: NSLayoutConstraint?
 	
-	private lazy var keyboardScrollHelper = NotificationKeyboard { height, isOn in
-		self.searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
-		
-		UIView.animate(withDuration: 0.3) {
-			self.view.layoutIfNeeded()
-		}
-	}
-	
 	private lazy var favoriteStatus = false
+	private lazy var notificationManager = NotificationManager()
 	
 	private lazy var Label: UILabel = {
 		let title = UILabel()
@@ -174,8 +167,6 @@ class MainVeloceViewController: UIViewController {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
-		_ = keyboardScrollHelper
-		
 		setupHeaderButton()
 		setupHeaderView()
 		setupSearchView()
@@ -211,10 +202,10 @@ class MainVeloceViewController: UIViewController {
 		let imageName = favoriteStatus ? "heart.fill" : "heart"
 		favoriteFilterButton.setImage(UIImage(systemName: imageName), for: .normal)
 
-		favoriteFFilters()
+		filterFavorites()
 	}
 	
-	private func favoriteFFilters() {
+	private func filterFavorites() {
 		let filteredModels = dataCars.filter{ card in
 			let matchesFavorite = favoriteStatus ? card.favoriteStatus : true
 			return matchesFavorite
@@ -268,6 +259,7 @@ class MainVeloceViewController: UIViewController {
 	
 	private func setupSearchView() {
 		searchView.delegate = self
+		notificationManager.delegate = self
 		view.addSubview(searchView)
 		
 		searchViewBottomConstraint = searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
@@ -324,19 +316,13 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 			description: fullCarModel.description
 		)
 
-		let descriptionCellVeloceViewController = DescriptionCellVeloceViewController()
-		descriptionCellVeloceViewController.viewModel = detailModel
-		descriptionCellVeloceViewController.favoriteStatus = fullCarModel.favoriteStatus
+		let descriptionViewController = DescriptionCellVeloceViewController()
+		descriptionViewController.viewModel = detailModel
+		descriptionViewController.favoriteStatus = fullCarModel.favoriteStatus
+		descriptionViewController.itemIndex = index
+		descriptionViewController.delegate = self
 		
-		descriptionCellVeloceViewController.didTapFavoriteAction = { [weak self] in
-			self?.dataCars[index].favoriteStatus.toggle()
-			
-			let newStatus = self?.dataCars[index].favoriteStatus
-			descriptionCellVeloceViewController.updateFavorite(isFavorite: newStatus ?? false)
-			self?.favoriteFFilters()
-		}
-		
-		navigationController?.pushViewController(descriptionCellVeloceViewController, animated: true)
+		navigationController?.pushViewController(descriptionViewController, animated: true)
 	}
 }
 
@@ -372,5 +358,27 @@ extension MainVeloceViewController: AddCarViewDelegate {
 		self.listCellModel.append(detailModel)
 		self.filterDataCars = listCellModel
 		self.layoutView.reloadData()
+	}
+}
+
+extension MainVeloceViewController: NotificationManagerDelegate {
+	func keyboardToggle(height: CGFloat, isOn: Bool) {
+		self.searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
+		
+		UIView.animate(withDuration: 0.3) {
+			self.view.layoutIfNeeded()
+		}
+	}
+}
+
+extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
+	func didTapFavoriteAction(index: Int) {
+		dataCars[index].favoriteStatus.toggle()
+		
+		let newStatus = dataCars[index].favoriteStatus
+		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
+			currentDetailVC.updateFavoriteStatus(isFavorite: newStatus)
+		}
+		filterFavorites()
 	}
 }

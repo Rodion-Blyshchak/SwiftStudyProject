@@ -24,18 +24,12 @@ class AddCarViewController: UIViewController {
 
 	//MARK: - Properties
 	var delegate: AddCarViewDelegate?
+	private lazy var notificationManager = NotificationManager()
 	
 	private lazy var scrollView = UIScrollView()
+	private lazy var contentView = UIView()
 	private lazy var cancelButton = UIButton()
 	private lazy var addCardButton = UIButton()
-	
-	private lazy var keyboardScrollHelper = NotificationKeyboard { height, isOn in
-//		guard isOn else { return }
-		self.scrollView.contentInset.bottom = height
-		self.scrollView.verticalScrollIndicatorInsets.bottom = height
-		
-		self.scrollToActiveField()
-	}
 
 	private lazy var topStrip: UIView = {
 		let strip = UIView()
@@ -96,7 +90,6 @@ class AddCarViewController: UIViewController {
 		description.font = .systemFont(ofSize: ConstantsSize.font)
 		description.delegate = self
 		description.returnKeyType = .done
-		// Як тут зробити висоту descr у всю висоту вільного екрану, так як це буде дл scrollView?
 		description.heightAnchor.constraint(equalToConstant: 200).isActive = true
 		return description
 	}()
@@ -117,9 +110,9 @@ class AddCarViewController: UIViewController {
 		view.backgroundColor = .appWhite
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
 		view.addGestureRecognizer(tapOutsideKeyboard)
-		_ = keyboardScrollHelper
 		
 		setupScrollView()
+		setupContentView()
 		setupHeaderButton()
 		setupTextField()
 		setupHeaderStackView()
@@ -229,6 +222,8 @@ class AddCarViewController: UIViewController {
 	//MARK: - StacksView
 	private func setupScrollView() {
 		scrollView.translatesAutoresizingMaskIntoConstraints = false
+		notificationManager.delegate = self
+		
 		view.addSubview(scrollView)
 		
 		NSLayoutConstraint.activate([
@@ -239,12 +234,25 @@ class AddCarViewController: UIViewController {
 		])
 	}
 	
+	private func setupContentView() {
+		contentView.translatesAutoresizingMaskIntoConstraints = false
+		scrollView.addSubview(contentView)
+		
+		NSLayoutConstraint.activate([
+			contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+			contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+			contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+			contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+			contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor)
+		])
+	}
+	
 	private func setupHeaderStackView() {
 		headerStackView.addArrangedSubview(cancelButton)
 		headerStackView.addArrangedSubview(topStrip)
 		headerStackView.addArrangedSubview(addCardButton)
 		
-		scrollView.addSubview(headerStackView)
+		contentView.addSubview(headerStackView)
 		
 		NSLayoutConstraint.activate([
 			headerStackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: ConstantsSize.mainTopIndent),
@@ -262,7 +270,7 @@ class AddCarViewController: UIViewController {
 		stackView.addArrangedSubview(weightTextField)
 		stackView.addArrangedSubview(descriptionTextField)
 		
-		scrollView.addSubview(stackView)
+		contentView.addSubview(stackView)
 		
 		NSLayoutConstraint.activate([
 			stackView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: ConstantsSize.mainTopIndent),
@@ -322,6 +330,13 @@ extension AddCarViewController: UIImagePickerControllerDelegate {
 	}
 }
 
-extension AddCarViewController: UINavigationControllerDelegate {
-	
+extension AddCarViewController: UINavigationControllerDelegate {}
+
+extension AddCarViewController: NotificationManagerDelegate {
+	func keyboardToggle(height: CGFloat, isOn: Bool) {
+		self.scrollView.contentInset.bottom = height
+		self.scrollView.verticalScrollIndicatorInsets.bottom = height
+		
+		self.scrollToActiveField()
+	}
 }
