@@ -16,5 +16,4 @@ struct CarModel {
 	let maxSpeed: Int
 	let acceleration: Float
 	let weight: Int
-	var favoriteStatus: Bool = false
 }

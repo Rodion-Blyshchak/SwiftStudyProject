@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DescriptionCellVeloceViewControllerDelegate {
-	func didTapFavoriteAction(index: Int)
+	func didTapFavoriteAction(id: String)
 }
 
 class DescriptionCellVeloceViewController: UIViewController {
@@ -26,7 +26,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	//MARK: - Properties
 	var viewModel: DetailViewControllerViewModel?
 	var delegate: DescriptionCellVeloceViewControllerDelegate?
-	var itemIndex: Int?
+	var itemID: String?
 	
 	private let imageView: UIImageView = {
 		let image = UIImageView()
@@ -109,6 +109,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	//MARK: - Func updateFavoriteButtonState
+	// 4 пункт
 	private func updateFavoriteButtonState(isFavorite: Bool) {
 		self.favoriteStatus = isFavorite
 		let title = isFavorite ? "Remove from Favorites" : "Add to Favorites"
@@ -171,8 +172,8 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	@objc private func didTapFavorite() {
-		guard let index = itemIndex else { return }
-		delegate?.didTapFavoriteAction(index: index)
+		guard let id = itemID else { return }
+		delegate?.didTapFavoriteAction(id: id)
 	}
 	
 	func updateFavoriteStatus(isFavorite: Bool) {

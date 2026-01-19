@@ -12,7 +12,7 @@ protocol AddCarViewDelegate {
 }
 
 class AddCarViewController: UIViewController {
-	enum ConstantsSize {
+	private enum ConstantsSize {
 		static let spacing: CGFloat = 10
 		static let cornerRadius: CGFloat = 8
 		static let heightAnchor: CGFloat = 40
@@ -21,10 +21,18 @@ class AddCarViewController: UIViewController {
 		static let negativeMainIndent: CGFloat = -16
 		static let mainTopIndent: CGFloat = 20
 	}
+	
+	private enum KeyStorageManager {
+		static let brandKey: String = "Brand"
+		static let modelKey: String = "Model"
+		static let accelerationKey: String = "Acceleration"
+		static let weightKey: String = "Weight"
+	}
 
 	//MARK: - Properties
 	var delegate: AddCarViewDelegate?
 	private lazy var notificationManager = NotificationManager()
+	private let defaults = UserDefaults.standard
 	
 	private lazy var scrollView = UIScrollView()
 	private lazy var contentView = UIView()
@@ -178,8 +186,25 @@ class AddCarViewController: UIViewController {
 			weight: Int(weightTextField.text ?? "") ?? 0
 		)
 		
+		let keys = [
+			KeyStorageManager.brandKey,
+			KeyStorageManager.modelKey,
+			KeyStorageManager.accelerationKey,
+			KeyStorageManager.weightKey
+		]
+		keys.forEach { defaults.removeObject(forKey: $0) }
+		
 		delegate?.didAddNewCar(car: newCardModel)
 		closeScreen()
+	}
+	
+	//MARK: - Func storageManager
+	private func saveStorageManager(vaule: String?, key: String) {
+		defaults.set(vaule, forKey: key)
+	}
+	
+	private func loadStorageManager(key: String) -> String? {
+		return defaults.string(forKey: key)
 	}
 	
 	//MARK: - Setup func
@@ -212,11 +237,31 @@ class AddCarViewController: UIViewController {
 			textField.heightAnchor.constraint(equalToConstant: ConstantsSize.heightAnchor).isActive = true
 			textField.delegate = self
 			textField.returnKeyType = .next
+			textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
 		}
+		
 		brandTextField.placeholder = "Brand"
 		modelTextField.placeholder = "Model"
 		accelerationTextField.placeholder = "0-100 km/h"
 		weightTextField.placeholder = "Weight"
+		
+		brandTextField.text = loadStorageManager(key: KeyStorageManager.brandKey)
+		modelTextField.text = loadStorageManager(key: KeyStorageManager.modelKey)
+		accelerationTextField.text = loadStorageManager(key: KeyStorageManager.accelerationKey)
+		weightTextField.text = loadStorageManager(key: KeyStorageManager.weightKey)
+	}
+	
+	@objc private func textFieldDidChange(_ textField: UITextField) {
+		let mapping: [UITextField: String] = [
+			brandTextField: KeyStorageManager.brandKey,
+			modelTextField: KeyStorageManager.modelKey,
+			accelerationTextField: KeyStorageManager.accelerationKey,
+			weightTextField: KeyStorageManager.weightKey
+		]
+		
+		if let key = mapping[textField] {
+			saveStorageManager(vaule: textField.text ?? "", key: key)
+		}
 	}
 	
 	//MARK: - StacksView
@@ -334,9 +379,9 @@ extension AddCarViewController: UINavigationControllerDelegate {}
 
 extension AddCarViewController: NotificationManagerDelegate {
 	func keyboardToggle(height: CGFloat, isOn: Bool) {
-		self.scrollView.contentInset.bottom = height
-		self.scrollView.verticalScrollIndicatorInsets.bottom = height
+		scrollView.contentInset.bottom = height
+		scrollView.verticalScrollIndicatorInsets.bottom = height
 		
-		self.scrollToActiveField()
+		scrollToActiveField()
 	}
 }

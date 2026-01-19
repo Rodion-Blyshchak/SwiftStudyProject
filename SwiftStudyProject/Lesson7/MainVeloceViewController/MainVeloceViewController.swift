@@ -81,11 +81,12 @@ class MainVeloceViewController: UIViewController {
 	
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
-	
 	private var searchViewBottomConstraint: NSLayoutConstraint?
 	
-	private lazy var favoriteStatus = false
-	private lazy var notificationManager = NotificationManager()
+	private let notificationManager = NotificationManager()
+	
+	private let storageManager = CarStorageManager()
+	private lazy var isFavoriteFilterActive = false
 	
 	private lazy var Label: UILabel = {
 		let title = UILabel()
@@ -167,11 +168,13 @@ class MainVeloceViewController: UIViewController {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
+		storageManager.delegate = self
 		setupHeaderButton()
 		setupHeaderView()
 		setupSearchView()
 		setupCollectionView()
 	}
+
 	
 	//MARK: - SetupHeaderButton
 	private func setupHeaderButton() {
@@ -197,21 +200,28 @@ class MainVeloceViewController: UIViewController {
 	
 	//MARK: - FavoriteFFilters
 	@objc private func toggleFavoriteFilter() {
-		favoriteStatus.toggle()
-
-		let imageName = favoriteStatus ? "heart.fill" : "heart"
+		isFavoriteFilterActive.toggle()
+		
+		let imageName = isFavoriteFilterActive ? "heart.fill" : "heart"
 		favoriteFilterButton.setImage(UIImage(systemName: imageName), for: .normal)
 
 		filterFavorites()
 	}
 	
 	private func filterFavorites() {
-		let filteredModels = dataCars.filter{ card in
-			let matchesFavorite = favoriteStatus ? card.favoriteStatus : true
-			return matchesFavorite
+		let filteredModels: [CarModel]
+		
+		if isFavoriteFilterActive {
+			filteredModels = dataCars.filter { car in
+				storageManager.isFavorite(id: car.id)
+			}
+		} else {
+			filteredModels = dataCars
 		}
 		
-		filterDataCars = filteredModels.map { CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team) }
+		filterDataCars = filteredModels.map {
+			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
+		}
 		layoutView.reloadData()
 	}
 	
@@ -270,7 +280,6 @@ class MainVeloceViewController: UIViewController {
 			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
-
 	
 	private func setupCollectionView() {
 		view.addSubview(layoutView)
@@ -305,8 +314,7 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let selectedItem = filterDataCars [indexPath.item]
-		guard let index = dataCars.firstIndex(where: { $0.id == selectedItem.id }) else { return }
-		let fullCarModel = dataCars[index]
+		guard let fullCarModel = dataCars.first(where: { $0.id == selectedItem.id }) else { return }
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
@@ -318,8 +326,8 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 
 		let descriptionViewController = DescriptionCellVeloceViewController()
 		descriptionViewController.viewModel = detailModel
-		descriptionViewController.favoriteStatus = fullCarModel.favoriteStatus
-		descriptionViewController.itemIndex = index
+		descriptionViewController.itemID = detailModel.id
+		descriptionViewController.favoriteStatus = storageManager.isFavorite(id: fullCarModel.id)
 		descriptionViewController.delegate = self
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
@@ -363,7 +371,7 @@ extension MainVeloceViewController: AddCarViewDelegate {
 
 extension MainVeloceViewController: NotificationManagerDelegate {
 	func keyboardToggle(height: CGFloat, isOn: Bool) {
-		self.searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
+		searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
 		
 		UIView.animate(withDuration: 0.3) {
 			self.view.layoutIfNeeded()
@@ -372,13 +380,20 @@ extension MainVeloceViewController: NotificationManagerDelegate {
 }
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
-	func didTapFavoriteAction(index: Int) {
-		dataCars[index].favoriteStatus.toggle()
-		
-		let newStatus = dataCars[index].favoriteStatus
-		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
-			currentDetailVC.updateFavoriteStatus(isFavorite: newStatus)
+	func didTapFavoriteAction(id: String) {
+		if storageManager.isFavorite(id: id) {
+			storageManager.remove(id: id)
+		} else {
+			storageManager.add(id: id)
 		}
+		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
+			currentDetailVC.updateFavoriteStatus(isFavorite: storageManager.isFavorite(id: id))
+		}
+	}
+}
+
+extension MainVeloceViewController: CarStorageManagerDelegate {
+	func didUpdateFavorites(list: [String]) {
 		filterFavorites()
 	}
 }
