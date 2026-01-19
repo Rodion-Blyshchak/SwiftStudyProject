@@ -12,7 +12,7 @@ protocol AddCarViewDelegate {
 }
 
 class AddCarViewController: UIViewController {
-	enum ConstantsSize {
+	private enum ConstantsSize {
 		static let spacing: CGFloat = 10
 		static let cornerRadius: CGFloat = 8
 		static let heightAnchor: CGFloat = 40
@@ -21,10 +21,21 @@ class AddCarViewController: UIViewController {
 		static let negativeMainIndent: CGFloat = -16
 		static let mainTopIndent: CGFloat = 20
 	}
+	
+	private enum KeyStorageManager {
+		static let brandKey: String = "Brand"
+		static let modelKey: String = "Model"
+		static let accelerationKey: String = "Acceleration"
+		static let weightKey: String = "Weight"
+	}
 
 	//MARK: - Properties
 	var delegate: AddCarViewDelegate?
+	private lazy var notificationManager = NotificationManager()
+	private let defaults = UserDefaults.standard
 	
+	private lazy var scrollView = UIScrollView()
+	private lazy var contentView = UIView()
 	private lazy var cancelButton = UIButton()
 	private lazy var addCardButton = UIButton()
 
@@ -87,6 +98,7 @@ class AddCarViewController: UIViewController {
 		description.font = .systemFont(ofSize: ConstantsSize.font)
 		description.delegate = self
 		description.returnKeyType = .done
+		description.heightAnchor.constraint(equalToConstant: 200).isActive = true
 		return description
 	}()
 	
@@ -107,6 +119,8 @@ class AddCarViewController: UIViewController {
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
 		view.addGestureRecognizer(tapOutsideKeyboard)
 		
+		setupScrollView()
+		setupContentView()
 		setupHeaderButton()
 		setupTextField()
 		setupHeaderStackView()
@@ -115,6 +129,15 @@ class AddCarViewController: UIViewController {
 	
 	@objc private func closeScreen() {
 		self.dismiss(animated: true)
+	}
+	
+	//MARK: - Func scrollToActiveField
+	private func scrollToActiveField() {
+		guard let activeView = stackView.arrangedSubviews.first(where: { $0.isFirstResponder}) else { return }
+		let coordinates = stackView.convert(activeView.frame, to: scrollView)
+		let visibleHeight = (scrollView.frame.height - scrollView.contentInset.bottom) - ConstantsSize.mainIndent
+		let offset = CGPoint(x: 0, y: coordinates.maxY - visibleHeight)
+		scrollView.setContentOffset(offset, animated: true)
 	}
 	
 	//MARK: - Func didTapAddPhoto
@@ -163,8 +186,25 @@ class AddCarViewController: UIViewController {
 			weight: Int(weightTextField.text ?? "") ?? 0
 		)
 		
+		let keys = [
+			KeyStorageManager.brandKey,
+			KeyStorageManager.modelKey,
+			KeyStorageManager.accelerationKey,
+			KeyStorageManager.weightKey
+		]
+		keys.forEach { defaults.removeObject(forKey: $0) }
+		
 		delegate?.didAddNewCar(car: newCardModel)
 		closeScreen()
+	}
+	
+	//MARK: - Func storageManager
+	private func saveStorageManager(vaule: String?, key: String) {
+		defaults.set(vaule, forKey: key)
+	}
+	
+	private func loadStorageManager(key: String) -> String? {
+		defaults.string(forKey: key)
 	}
 	
 	//MARK: - Setup func
@@ -197,25 +237,72 @@ class AddCarViewController: UIViewController {
 			textField.heightAnchor.constraint(equalToConstant: ConstantsSize.heightAnchor).isActive = true
 			textField.delegate = self
 			textField.returnKeyType = .next
+			textField.addTarget(self, action: #selector(textFieldDidChange(_:)), for: .editingChanged)
 		}
+		
 		brandTextField.placeholder = "Brand"
 		modelTextField.placeholder = "Model"
 		accelerationTextField.placeholder = "0-100 km/h"
 		weightTextField.placeholder = "Weight"
+		
+		brandTextField.text = loadStorageManager(key: KeyStorageManager.brandKey)
+		modelTextField.text = loadStorageManager(key: KeyStorageManager.modelKey)
+		accelerationTextField.text = loadStorageManager(key: KeyStorageManager.accelerationKey)
+		weightTextField.text = loadStorageManager(key: KeyStorageManager.weightKey)
+	}
+	
+	@objc private func textFieldDidChange(_ textField: UITextField) {
+		let mapping: [UITextField: String] = [
+			brandTextField: KeyStorageManager.brandKey,
+			modelTextField: KeyStorageManager.modelKey,
+			accelerationTextField: KeyStorageManager.accelerationKey,
+			weightTextField: KeyStorageManager.weightKey
+		]
+		
+		if let key = mapping[textField] {
+			saveStorageManager(vaule: textField.text ?? "", key: key)
+		}
 	}
 	
 	//MARK: - StacksView
+	private func setupScrollView() {
+		scrollView.translatesAutoresizingMaskIntoConstraints = false
+		notificationManager.delegate = self
+		
+		view.addSubview(scrollView)
+		
+		NSLayoutConstraint.activate([
+			scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+			scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+			scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+		])
+	}
+	
+	private func setupContentView() {
+		contentView.translatesAutoresizingMaskIntoConstraints = false
+		scrollView.addSubview(contentView)
+		
+		NSLayoutConstraint.activate([
+			contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+			contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+			contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+			contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+			contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor)
+		])
+	}
+	
 	private func setupHeaderStackView() {
 		headerStackView.addArrangedSubview(cancelButton)
 		headerStackView.addArrangedSubview(topStrip)
 		headerStackView.addArrangedSubview(addCardButton)
 		
-		view.addSubview(headerStackView)
+		contentView.addSubview(headerStackView)
 		
 		NSLayoutConstraint.activate([
-			headerStackView.topAnchor.constraint(equalTo: view.topAnchor, constant: ConstantsSize.mainTopIndent),
-			headerStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			headerStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			headerStackView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor, constant: ConstantsSize.mainTopIndent),
+			headerStackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: ConstantsSize.mainIndent),
+			headerStackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
@@ -228,13 +315,13 @@ class AddCarViewController: UIViewController {
 		stackView.addArrangedSubview(weightTextField)
 		stackView.addArrangedSubview(descriptionTextField)
 		
-		view.addSubview(stackView)
+		contentView.addSubview(stackView)
 		
 		NSLayoutConstraint.activate([
 			stackView.topAnchor.constraint(equalTo: headerStackView.bottomAnchor, constant: ConstantsSize.mainTopIndent),
-			stackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			stackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-			stackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+			stackView.leadingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.leadingAnchor, constant: ConstantsSize.mainIndent),
+			stackView.trailingAnchor.constraint(equalTo: scrollView.frameLayoutGuide.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			stackView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
 		])
 	}
 }
@@ -288,6 +375,13 @@ extension AddCarViewController: UIImagePickerControllerDelegate {
 	}
 }
 
-extension AddCarViewController: UINavigationControllerDelegate {
-	
+extension AddCarViewController: UINavigationControllerDelegate {}
+
+extension AddCarViewController: NotificationManagerDelegate {
+	func keyboardToggle(height: CGFloat, isOn: Bool) {
+		scrollView.contentInset.bottom = height
+		scrollView.verticalScrollIndicatorInsets.bottom = height
+		
+		scrollToActiveField()
+	}
 }

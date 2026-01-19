@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol DescriptionCellVeloceViewControllerDelegate {
+	func didTapFavoriteAction(id: String)
+}
+
 class DescriptionCellVeloceViewController: UIViewController {
 	enum ConstantsSize {
 		static let imageHeightAnchor: CGFloat = 300
@@ -19,29 +23,11 @@ class DescriptionCellVeloceViewController: UIViewController {
 		static let cornerRadius: CGFloat = 20
 	}
 	
+	//MARK: - Properties
 	var viewModel: DetailViewControllerViewModel?
-
-	override func viewWillAppear(_ animated: Bool) {
-		super.viewWillAppear(animated)
-		navigationController?.setNavigationBarHidden(false, animated: animated)
-	}
-
-	override func viewWillDisappear(_ animated: Bool) {
-		super.viewWillDisappear(animated)
-		navigationController?.setNavigationBarHidden(true, animated: animated)
-	}
+	var delegate: DescriptionCellVeloceViewControllerDelegate?
+	var itemID: String?
 	
-	override func viewDidLoad() {
-		super.viewDidLoad()
-		view.backgroundColor = .appWhite
-		
-		setupTopContent()
-		setupTitle()
-		setupdescription()
-		setupButton()
-	}
-	
-	//MARK: - TopContent
 	private let imageView: UIImageView = {
 		let image = UIImageView()
 		image.translatesAutoresizingMaskIntoConstraints = false
@@ -50,43 +36,6 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return image
 	}()
 	
-	private func setupTopContent() {
-		guard let viewModel else { return }
-		
-		imageView.image = viewModel.image
-		
-		view.addSubview(imageView)
-		
-		NSLayoutConstraint.activate([
-			imageView.topAnchor.constraint(equalTo: view.topAnchor),
-			imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-			imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-		])
-		
-		let likeButton = UIButton()
-		let buttonImage = UIImage(named: "likeIcon")?.withRenderingMode(.alwaysTemplate)
-		likeButton.setImage(buttonImage, for: .normal)
-		if #available(iOS 26.0, *) {
-			likeButton.backgroundColor = .clear
-		} else if #available(iOS 15.0, *) {
-			likeButton.backgroundColor = .appWhite
-			likeButton.layer.borderWidth = 1.0
-			likeButton.layer.borderColor = UIColor(named: "appGreyDark")?.cgColor
-		}
-		likeButton.tintColor = .appBlack
-		likeButton.translatesAutoresizingMaskIntoConstraints = false
-		likeButton.widthAnchor.constraint(equalToConstant: ConstantsSize.buttonWidthAnchor).isActive = true
-		likeButton.heightAnchor.constraint(equalToConstant: ConstantsSize.buttonHeightAnchor).isActive = true
-		likeButton.layer.cornerRadius = ConstantsSize.buttonWidthAnchor / 2
-		view.addSubview(likeButton)
-		
-		NSLayoutConstraint.activate([
-			likeButton.topAnchor.constraint(equalTo: view.topAnchor, constant: 60),
-			likeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
-		])
-	}
-	
-	//MARK: - Title
 	private let nameCarLabel: UILabel = {
 		let nameLable = UILabel()
 		nameLable.translatesAutoresizingMaskIntoConstraints = false
@@ -113,6 +62,76 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return stackView
 	}()
 	
+	private let carDescriptionLabel: UILabel = {
+		let descriptionLabel = UILabel()
+		descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+		descriptionLabel.textColor = .appGreyDark
+		descriptionLabel.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
+		descriptionLabel.numberOfLines = 0
+		return descriptionLabel
+	}()
+	
+	lazy var favoriteStatus: Bool = false
+	
+	private let favoriteButton: UIButton = {
+		let button = UIButton()
+		button.translatesAutoresizingMaskIntoConstraints = false
+		button.backgroundColor = .appBlack
+		button.setTitleColor(.appWhite, for: .normal)
+		button.titleLabel?.font = .systemFont(ofSize: ConstantsSize.font, weight: .bold)
+		button.layer.cornerRadius = ConstantsSize.cornerRadius
+		button.heightAnchor.constraint(equalToConstant: ConstantsSize.buttonHeightAnchor).isActive = true
+		button.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
+		return button
+	}()
+
+	//MARK: - Lifecycle
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		navigationController?.setNavigationBarHidden(false, animated: animated)
+	}
+
+	override func viewWillDisappear(_ animated: Bool) {
+		super.viewWillDisappear(animated)
+		navigationController?.setNavigationBarHidden(true, animated: animated)
+	}
+	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+		view.backgroundColor = .appWhite
+		
+		setupTopContent()
+		setupTitle()
+		setupdescription()
+		setupFavoriteButton()
+		
+		updateFavoriteButtonState(isFavorite: favoriteStatus)
+	}
+	
+	//MARK: - Func updateFavoriteButtonState
+	// 4 пункт
+	private func updateFavoriteButtonState(isFavorite: Bool) {
+		self.favoriteStatus = isFavorite
+		let title = isFavorite ? "Remove from Favorites" : "Add to Favorites"
+		favoriteButton.setTitle(title, for: .normal)
+		favoriteButton.backgroundColor = isFavorite ? .appGreyDark : .appBlack
+	}
+	
+	//MARK: - Setup
+	private func setupTopContent() {
+		guard let viewModel else { return }
+		
+		imageView.image = viewModel.image
+		
+		view.addSubview(imageView)
+		
+		NSLayoutConstraint.activate([
+			imageView.topAnchor.constraint(equalTo: view.topAnchor),
+			imageView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			imageView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+		])
+	}
+	
 	private func setupTitle() {
 		guard let viewModel else { return } // повторюється!
 		
@@ -129,49 +148,35 @@ class DescriptionCellVeloceViewController: UIViewController {
 		])
 	}
 	
-	//MARK: - Description
-	private let descriptionCar: UILabel = {
-		let description = UILabel()
-		description.translatesAutoresizingMaskIntoConstraints = false
-		description.textColor = .appGreyDark
-		description.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
-		description.numberOfLines = 0
-		return description
-	}()
-	
 	private func setupdescription() {
 		guard let viewModel else { return }
 		
-		descriptionCar.text = viewModel.description
-		view.addSubview(descriptionCar)
+		carDescriptionLabel.text = viewModel.description
+		view.addSubview(carDescriptionLabel)
 		
 		NSLayoutConstraint.activate([
-			descriptionCar.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
-			descriptionCar.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			descriptionCar.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
+			carDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			carDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
-	//MARK: - Button
-	private let addButton: UIButton = {
-		let button = UIButton()
-		button.translatesAutoresizingMaskIntoConstraints = false
-		button.backgroundColor = .appBlack
-		button.setTitle("Add", for: .normal)
-		button.setTitleColor(.appWhite, for: .normal)
-		button.titleLabel?.font = .systemFont(ofSize: ConstantsSize.font, weight: .bold)
-		button.layer.cornerRadius = ConstantsSize.cornerRadius
-		button.heightAnchor.constraint(equalToConstant: ConstantsSize.buttonHeightAnchor).isActive = true
-		return button
-	}()
-	
-	private func setupButton() {
-		view.addSubview(addButton)
+	private func setupFavoriteButton() {
+		view.addSubview(favoriteButton)
 		
 		NSLayoutConstraint.activate([
-			addButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-			addButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			addButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+			favoriteButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+			favoriteButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			favoriteButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
+	}
+	
+	@objc private func didTapFavorite() {
+		guard let id = itemID else { return }
+		delegate?.didTapFavoriteAction(id: id)
+	}
+	
+	func updateFavoriteStatus(isFavorite: Bool) {
+		updateFavoriteButtonState(isFavorite: isFavorite)
 	}
 }
