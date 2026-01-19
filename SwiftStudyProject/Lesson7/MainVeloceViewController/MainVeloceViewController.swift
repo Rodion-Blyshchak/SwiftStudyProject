@@ -381,11 +381,8 @@ extension MainVeloceViewController: NotificationManagerDelegate {
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: String) {
-		if storageManager.isFavorite(id: id) {
-			storageManager.remove(id: id)
-		} else {
-			storageManager.add(id: id)
-		}
+		storageManager.isFavorite(id: id) ? storageManager.remove(id: id) : storageManager.add(id: id)
+		
 		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
 			currentDetailVC.updateFavoriteStatus(isFavorite: storageManager.isFavorite(id: id))
 		}

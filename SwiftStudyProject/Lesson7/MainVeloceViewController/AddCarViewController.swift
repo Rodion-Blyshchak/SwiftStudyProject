@@ -204,7 +204,7 @@ class AddCarViewController: UIViewController {
 	}
 	
 	private func loadStorageManager(key: String) -> String? {
-		return defaults.string(forKey: key)
+		defaults.string(forKey: key)
 	}
 	
 	//MARK: - Setup func

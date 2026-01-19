@@ -22,10 +22,10 @@ class CarStorageManager {
 	}
 	
 	func add(id: String) {
-		if !listFavorite.contains(id) {
-			listFavorite.append(id)
-			syncData()
-		}
+		guard !listFavorite.contains(id) else { return }
+		
+		listFavorite.append(id)
+		syncData()
 	}
 	
 	func remove(id: String) {
@@ -36,7 +36,7 @@ class CarStorageManager {
 	}
 	
 	func isFavorite(id: String) -> Bool {
-		return listFavorite.contains(id)
+		 listFavorite.contains(id)
 	}
 	
 	func syncData() {
