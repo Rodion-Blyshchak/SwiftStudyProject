@@ -6,10 +6,12 @@
 //
 
 import UIKit
+//import AudioToolbox
 
 class MainAnimations: UIViewController {
 	//MARK: - Properties
 	private var offset: CGPoint?
+	private let vibrationGenerator = UIImpactFeedbackGenerator(style: .medium) // .light, .medium, .heavy, .soft, .rigid
 	
 	private lazy var imageCarView: UIImageView = {
 		let imageView = UIImageView()
@@ -21,6 +23,17 @@ class MainAnimations: UIViewController {
 		imageView.image = icon
 		imageView.tintColor = .appBlack
 		return imageView
+	}()
+	
+	private lazy var rotationSlider: UISlider = {
+		let slider = UISlider()
+		slider.translatesAutoresizingMaskIntoConstraints = false
+		slider.minimumValue = 0
+		slider.maximumValue = Float.pi * 2
+		slider.alpha = 0
+		slider.minimumTrackTintColor = .appBlack
+		slider.addTarget(self, action: #selector(sliderChanged(_:)), for: .valueChanged)
+		return slider
 	}()
 	
 	private lazy var addCarButton: UIButton = {
@@ -41,17 +54,21 @@ class MainAnimations: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
-		view.addSubview(imageCarView)
-		imageCarView.alpha = 0
+//		view.addSubview(imageCarView)
 		
-		setupButton()
 		setupImageView()
+		setupButton()
+		setupSlider()
+		
+		imageCarView.alpha = 0
 	}
 	
 	//MARK: - Animate func
 	@objc private func addCarAction() {
+		
 		UIView.animate(withDuration: 0.3) {
 			self.imageCarView.alpha = 1
+			self.rotationSlider.alpha = 1
 			let randomX = CGFloat.random(in: 20...(self.view.bounds.width - 100))
 			let randomY = CGFloat.random(in: 20...(self.view.bounds.height - 100))
 			
@@ -68,6 +85,8 @@ class MainAnimations: UIViewController {
 	
 	// Ефект натиску
 	@objc private func handleSingleTap() {
+		vibrationGenerator.impactOccurred()
+		
 		UIView.animate(withDuration: 0.3) {
 			self.imageCarView.transform = self.imageCarView.transform.rotated(by: .pi / 2)
 		}
@@ -82,6 +101,11 @@ class MainAnimations: UIViewController {
 		}
 	}
 	
+	// Slider
+	@objc private func sliderChanged( _ sender: UISlider) {
+		imageCarView.transform = CGAffineTransform(rotationAngle: CGFloat(sender.value))
+	}
+	
 	// Ефект перетягування
 	@objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
 		let location = gestureRecognizer.location(in: view)
@@ -90,6 +114,8 @@ class MainAnimations: UIViewController {
 		case.began:
 			let locationView = gestureRecognizer.location(in: imageCarView)
 			offset = locationView
+
+			vibrationGenerator.impactOccurred()
 			
 			UIView.animate(withDuration: 0.3, animations: {
 				self.imageCarView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
@@ -155,6 +181,16 @@ class MainAnimations: UIViewController {
 		let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
 		longPress.minimumPressDuration = 0.8
 		imageCarView.addGestureRecognizer(longPress)
+	}
+	
+	private func setupSlider() {
+		view.addSubview(rotationSlider)
+		
+		NSLayoutConstraint.activate([
+			rotationSlider.bottomAnchor.constraint(equalTo: addCarButton.topAnchor, constant: -20),
+			rotationSlider.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 30),
+			rotationSlider.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -30)
+		])
 	}
 }
 
