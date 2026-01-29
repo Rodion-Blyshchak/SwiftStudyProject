@@ -6,24 +6,17 @@
 //
 
 import UIKit
-//import AudioToolbox
 
-class MainAnimations: UIViewController {
+class MainAnimationViewController: UIViewController {
 	//MARK: - Properties
+	private var imageCarsView: [UIImageView] = []
+	private var currentImageCarView: UIImageView? {
+		return imageCarsView.first
+	}
+	
 	private var offset: CGPoint?
 	private let vibrationGenerator = UIImpactFeedbackGenerator(style: .medium) // .light, .medium, .heavy, .soft, .rigid
-	
-	private lazy var imageCarView: UIImageView = {
-		let imageView = UIImageView()
-		imageView.translatesAutoresizingMaskIntoConstraints = false
-		imageView.isUserInteractionEnabled = true
-		imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
-//		imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
-		let icon = UIImage.carF1.withRenderingMode(.alwaysTemplate)
-		imageView.image = icon
-		imageView.tintColor = .appBlack
-		return imageView
-	}()
+	private var currentAngle: CGFloat = 0
 	
 	private lazy var rotationSlider: UISlider = {
 		let slider = UISlider()
@@ -36,7 +29,7 @@ class MainAnimations: UIViewController {
 		return slider
 	}()
 	
-	private lazy var addCarButton: UIButton = {
+	private let addCarButton: UIButton = {
 		let button = UIButton()
 		button.translatesAutoresizingMaskIntoConstraints = false
 		button.heightAnchor.constraint(equalToConstant: 50).isActive = true
@@ -46,7 +39,7 @@ class MainAnimations: UIViewController {
 		button.setTitle("Add", for: .normal)
 		button.setTitleColor(.appWhite, for: .normal)
 		button.titleLabel?.font = .systemFont(ofSize: 18, weight: .bold)
-		button.addTarget(self, action: #selector(addCarAction), for: .touchUpInside)
+		button.addTarget(self, action: #selector(didTapAddButton), for: .touchUpInside)
 		return	button
 	}()
 	
@@ -54,32 +47,56 @@ class MainAnimations: UIViewController {
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
-//		view.addSubview(imageCarView)
 		
-		setupImageView()
+	
 		setupButton()
 		setupSlider()
 		
-		imageCarView.alpha = 0
+		currentImageCarView?.alpha = 0
+	}
+	
+	//MARK: - CreateNewImageCar func
+	private func createNewImageCar() -> UIImageView {
+		let imageView = UIImageView()
+		imageView.translatesAutoresizingMaskIntoConstraints = false
+		imageView.isUserInteractionEnabled = true
+		imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+//		imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
+		let icon = UIImage.carF1.withRenderingMode(.alwaysTemplate)
+		imageView.image = icon
+		imageView.tintColor = .appBlack
+		
+		setupImageView(imageView)
+		return imageView
 	}
 	
 	//MARK: - Animate func
-	@objc private func addCarAction() {
+	@objc private func didTapAddButton() {
+		guard imageCarsView.isEmpty else { return }
+		
+		let newImageCar = createNewImageCar()
+		view.addSubview(newImageCar)
+		imageCarsView.append(newImageCar)
 		
 		UIView.animate(withDuration: 0.3) {
-			self.imageCarView.alpha = 1
+			newImageCar.alpha = 1
 			self.rotationSlider.alpha = 1
 			let randomX = CGFloat.random(in: 20...(self.view.bounds.width - 100))
 			let randomY = CGFloat.random(in: 20...(self.view.bounds.height - 100))
 			
-			self.imageCarView.center = CGPoint(x: randomX, y: randomY)
+			newImageCar.center = CGPoint(x: randomX, y: randomY)
 		}
 	}
 	
+	private func updateCarRotation() {
+		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
+		rotationSlider.value = Float(currentAngle)
+	}
+	
 	// Ефект скролу
-	@objc private func didSwipe() {
+	@objc private func handleSwipe() {
 		UIView.animate(withDuration: 0.3, animations: {
-			self.imageCarView.tintColor = [.red, .blue, .cyan, .darkGray, .green, .orange].randomElement()
+			self.currentImageCarView?.tintColor = [.red, .blue, .cyan, .darkGray, .green, .orange].randomElement()
 		})
 	}
 	
@@ -88,22 +105,31 @@ class MainAnimations: UIViewController {
 		vibrationGenerator.impactOccurred()
 		
 		UIView.animate(withDuration: 0.3) {
-			self.imageCarView.transform = self.imageCarView.transform.rotated(by: .pi / 2)
+			self.currentAngle += .pi / 2
+			
+			if self.currentAngle >= .pi * 2 {
+				self.currentAngle -= .pi * 2
+			}
+			
+			self.updateCarRotation()
 		}
 	}
 	
 	@objc private func handleTripleTap() {
 		UIView.animate(withDuration: 0.5, animations: {
-			self.imageCarView.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-			self.imageCarView.alpha = 0
+			self.currentImageCarView?.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+			self.currentImageCarView?.alpha = 0
 		}) { _ in
-			self.imageCarView.removeFromSuperview()
+			self.currentImageCarView?.removeFromSuperview()
 		}
+		
+		self.imageCarsView.removeAll()
 	}
 	
 	// Slider
 	@objc private func sliderChanged( _ sender: UISlider) {
-		imageCarView.transform = CGAffineTransform(rotationAngle: CGFloat(sender.value))
+		currentAngle = CGFloat(sender.value)
+		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
 	}
 	
 	// Ефект перетягування
@@ -112,30 +138,30 @@ class MainAnimations: UIViewController {
 		
 		switch gestureRecognizer.state {
 		case.began:
-			let locationView = gestureRecognizer.location(in: imageCarView)
+			let locationView = gestureRecognizer.location(in: currentImageCarView)
 			offset = locationView
 
 			vibrationGenerator.impactOccurred()
 			
 			UIView.animate(withDuration: 0.3, animations: {
-				self.imageCarView.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-				self.imageCarView.alpha = 0.6
+				self.currentImageCarView?.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+				self.currentImageCarView?.alpha = 0.6
 			})
 			
 		case.changed:
 			guard let offset = offset else { return }
 			
-			imageCarView.center = CGPoint(
-				x: location.x + (imageCarView.bounds.midX - offset.x),
-				y: location.y + (imageCarView.bounds.midY - offset.y)
+			currentImageCarView?.center = CGPoint(
+				x: location.x + ((currentImageCarView?.bounds.midX ?? 0) - offset.x),
+				y: location.y + ((currentImageCarView?.bounds.midY ?? 0) - offset.y)
 			)
 			
 		case.ended:
 			offset = nil
 			
 			UIView.animate(withDuration: 0.3, animations: {
-				self.imageCarView.transform = .identity
-				self.imageCarView.alpha = 1
+				self.updateCarRotation()
+				self.currentImageCarView?.alpha = 1
 			})
 			
 		default:
@@ -155,32 +181,31 @@ class MainAnimations: UIViewController {
 		])
 	}
 	
-	private func setupImageView() {
-		view.addSubview(imageCarView)
+	private func setupImageView(_ image: UIImageView) {
 		// Swipe
-		let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe))
+		let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
 		swipeRight.direction = .right
-		imageCarView.addGestureRecognizer(swipeRight)
+		image.addGestureRecognizer(swipeRight)
 		
-		let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(didSwipe))
+		let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe))
 		swipeLeft.direction = .left
-		imageCarView.addGestureRecognizer(swipeLeft)
+		image.addGestureRecognizer(swipeLeft)
 		
 		// Tap
 		let tripleTap = UITapGestureRecognizer(target: self, action: #selector(handleTripleTap))
 		tripleTap.numberOfTapsRequired = 3
-		imageCarView.addGestureRecognizer(tripleTap)
+		image.addGestureRecognizer(tripleTap)
 		
 		let singleTap = UITapGestureRecognizer(target: self, action: #selector(handleSingleTap))
 		singleTap.numberOfTapsRequired = 1
 	
 		singleTap.require(toFail: tripleTap)
-		imageCarView.addGestureRecognizer(singleTap)
+		image.addGestureRecognizer(singleTap)
 		
 		// Drag and drop
 		let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
 		longPress.minimumPressDuration = 0.8
-		imageCarView.addGestureRecognizer(longPress)
+		image.addGestureRecognizer(longPress)
 	}
 	
 	private func setupSlider() {
