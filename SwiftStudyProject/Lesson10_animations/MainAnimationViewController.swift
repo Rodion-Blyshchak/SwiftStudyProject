@@ -9,10 +9,11 @@ import UIKit
 
 class MainAnimationViewController: UIViewController {
 	//MARK: - Properties
-	private var imageCarsView: [UIImageView] = []
-	private var currentImageCarView: UIImageView? {
-		return imageCarsView.first
-	}
+	private var imageCarViews: [UIImageView] = []
+//	private var currentImageCarView: UIImageView? {
+//		return imageCarViews.last
+//	}
+	private var activeCar: UIImageView?
 	
 	private var offset: CGPoint?
 	private let vibrationGenerator = UIImpactFeedbackGenerator(style: .medium) // .light, .medium, .heavy, .soft, .rigid
@@ -48,18 +49,16 @@ class MainAnimationViewController: UIViewController {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		
-	
 		setupButton()
 		setupSlider()
-		
-		currentImageCarView?.alpha = 0
 	}
 	
 	//MARK: - CreateNewImageCar func
 	private func createNewImageCar() -> UIImageView {
 		let imageView = UIImageView()
-		imageView.translatesAutoresizingMaskIntoConstraints = false
+//		imageView.translatesAutoresizingMaskIntoConstraints = false
 		imageView.isUserInteractionEnabled = true
+		imageView.frame = CGRect(x: 0, y: 0, width: 200, height: 200)
 		imageView.heightAnchor.constraint(equalToConstant: 200).isActive = true
 //		imageView.widthAnchor.constraint(equalToConstant: 200).isActive = true
 		let icon = UIImage.carF1.withRenderingMode(.alwaysTemplate)
@@ -72,96 +71,108 @@ class MainAnimationViewController: UIViewController {
 	
 	//MARK: - Animate func
 	@objc private func didTapAddButton() {
-		guard imageCarsView.isEmpty else { return }
-		
 		let newImageCar = createNewImageCar()
 		view.addSubview(newImageCar)
-		imageCarsView.append(newImageCar)
+		imageCarViews.append(newImageCar)
+		activeCar = newImageCar
+		
+		view.layoutIfNeeded()
+		
+		let randomX = CGFloat.random(in: 100...(view.bounds.width - 100))
+		let randomY = CGFloat.random(in: 100...(view.bounds.height - 100))
+		
+		newImageCar.center = CGPoint(x: randomX, y: randomY)
+		newImageCar.alpha = 0
 		
 		UIView.animate(withDuration: 0.3) {
 			newImageCar.alpha = 1
 			self.rotationSlider.alpha = 1
-			let randomX = CGFloat.random(in: 20...(self.view.bounds.width - 100))
-			let randomY = CGFloat.random(in: 20...(self.view.bounds.height - 100))
-			
-			newImageCar.center = CGPoint(x: randomX, y: randomY)
 		}
+		
+		// Елементи будуть з найбільшим z-індексом
+		view.bringSubviewToFront(addCarButton)
+		view.bringSubviewToFront(rotationSlider)
 	}
 	
-	private func updateCarRotation() {
-		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
-		rotationSlider.value = Float(currentAngle)
-	}
+//	private func updateCarRotation(_ sender: UISwipeGestureRecognizer) {
+//		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
+//		rotationSlider.value = Float(currentAngle)
+//	}
 	
 	// Ефект скролу
-	@objc private func handleSwipe() {
+	@objc private func handleSwipe(_ sender: UISwipeGestureRecognizer) {
+		guard let target = sender.view as? UIImageView else { return }
+		activeCar = target
 		UIView.animate(withDuration: 0.3, animations: {
-			self.currentImageCarView?.tintColor = [.red, .blue, .cyan, .darkGray, .green, .orange].randomElement()
+			target.tintColor = [.red, .blue, .cyan, .darkGray, .green, .orange].randomElement()
 		})
 	}
 	
 	// Ефект натиску
-	@objc private func handleSingleTap() {
+	@objc private func handleSingleTap(_ sender: UITapGestureRecognizer) {
+		guard let target = sender.view as? UIImageView else { return }
+		activeCar = target
 		vibrationGenerator.impactOccurred()
 		
+		currentAngle += .pi / 2
+		if currentAngle >= .pi * 2 { currentAngle -= .pi * 2 }
+		
 		UIView.animate(withDuration: 0.3) {
-			self.currentAngle += .pi / 2
-			
-			if self.currentAngle >= .pi * 2 {
-				self.currentAngle -= .pi * 2
-			}
-			
-			self.updateCarRotation()
+			target.transform = CGAffineTransform(rotationAngle: self.currentAngle)
+			self.rotationSlider.value = Float(self.currentAngle)
 		}
 	}
 	
-	@objc private func handleTripleTap() {
+	@objc private func handleTripleTap(_ sender: UISwipeGestureRecognizer) {
+		guard let target = sender.view as? UIImageView else { return }
 		UIView.animate(withDuration: 0.5, animations: {
-			self.currentImageCarView?.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
-			self.currentImageCarView?.alpha = 0
+			target.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
+			target.alpha = 0
 		}) { _ in
-			self.currentImageCarView?.removeFromSuperview()
+			target.removeFromSuperview()
+			self.imageCarViews.removeAll(where: { $0 == target })
 		}
-		
-		self.imageCarsView.removeAll()
 	}
 	
 	// Slider
 	@objc private func sliderChanged( _ sender: UISlider) {
 		currentAngle = CGFloat(sender.value)
-		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
+		activeCar?.transform = CGAffineTransform(rotationAngle: currentAngle)
 	}
 	
 	// Ефект перетягування
 	@objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+		guard let targetCar = gestureRecognizer.view as? UIImageView else { return }
 		let location = gestureRecognizer.location(in: view)
 		
 		switch gestureRecognizer.state {
 		case.began:
-			let locationView = gestureRecognizer.location(in: currentImageCarView)
+			activeCar = targetCar
+			let locationView = gestureRecognizer.location(in: targetCar)
 			offset = locationView
 
 			vibrationGenerator.impactOccurred()
 			
 			UIView.animate(withDuration: 0.3, animations: {
-				self.currentImageCarView?.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
-				self.currentImageCarView?.alpha = 0.6
+				targetCar.transform = CGAffineTransform(scaleX: 1.2, y: 1.2)
+				targetCar.alpha = 0.6
 			})
 			
 		case.changed:
 			guard let offset = offset else { return }
 			
-			currentImageCarView?.center = CGPoint(
-				x: location.x + ((currentImageCarView?.bounds.midX ?? 0) - offset.x),
-				y: location.y + ((currentImageCarView?.bounds.midY ?? 0) - offset.y)
+			targetCar.center = CGPoint(
+				x: location.x + ((targetCar.bounds.midX) - offset.x),
+				y: location.y + ((targetCar.bounds.midY) - offset.y)
 			)
 			
 		case.ended:
 			offset = nil
 			
 			UIView.animate(withDuration: 0.3, animations: {
-				self.updateCarRotation()
-				self.currentImageCarView?.alpha = 1
+//				self.updateCarRotation()
+				targetCar.transform = CGAffineTransform(rotationAngle: self.currentAngle)
+				targetCar.alpha = 1
 			})
 			
 		default:
