@@ -9,15 +9,15 @@ import UIKit
 
 class MainAnimationViewController: UIViewController {
 	//MARK: - Properties
-	private var imageCarViews: [UIImageView] = []
-//	private var currentImageCarView: UIImageView? {
-//		return imageCarViews.last
-//	}
-	private var activeCar: UIImageView?
+	private var carModels: [ImageCarModel] = []
+	private var activeCarId: String?
+	
+	private var activeModel: ImageCarModel? {
+		return carModels.first(where: { $0.id == activeCarId })
+	}
 	
 	private var offset: CGPoint?
 	private let vibrationGenerator = UIImpactFeedbackGenerator(style: .medium) // .light, .medium, .heavy, .soft, .rigid
-	private var currentAngle: CGFloat = 0
 	
 	private lazy var rotationSlider: UISlider = {
 		let slider = UISlider()
@@ -73,10 +73,13 @@ class MainAnimationViewController: UIViewController {
 	@objc private func didTapAddButton() {
 		let newImageCar = createNewImageCar()
 		view.addSubview(newImageCar)
-		imageCarViews.append(newImageCar)
-		activeCar = newImageCar
 		
-		view.layoutIfNeeded()
+		let id = UUID().uuidString
+		newImageCar.accessibilityIdentifier = id
+		let newNodel = ImageCarModel(id: id, image: newImageCar, currentAngle: 0)
+		
+		carModels.append(newNodel)
+		activeCarId = id
 		
 		let randomX = CGFloat.random(in: 100...(view.bounds.width - 100))
 		let randomY = CGFloat.random(in: 100...(view.bounds.height - 100))
@@ -87,6 +90,7 @@ class MainAnimationViewController: UIViewController {
 		UIView.animate(withDuration: 0.3) {
 			newImageCar.alpha = 1
 			self.rotationSlider.alpha = 1
+			self.rotationSlider.value = 0
 		}
 		
 		// Елементи будуть з найбільшим z-індексом
@@ -94,15 +98,11 @@ class MainAnimationViewController: UIViewController {
 		view.bringSubviewToFront(rotationSlider)
 	}
 	
-//	private func updateCarRotation(_ sender: UISwipeGestureRecognizer) {
-//		currentImageCarView?.transform = CGAffineTransform(rotationAngle: currentAngle)
-//		rotationSlider.value = Float(currentAngle)
-//	}
-	
 	// Ефект скролу
 	@objc private func handleSwipe(_ sender: UISwipeGestureRecognizer) {
-		guard let target = sender.view as? UIImageView else { return }
-		activeCar = target
+		guard let target = sender.view as? UIImageView,
+			  let id = target.accessibilityIdentifier else { return }
+		activeCarId = id
 		UIView.animate(withDuration: 0.3, animations: {
 			target.tintColor = [.red, .blue, .cyan, .darkGray, .green, .orange].randomElement()
 		})
@@ -110,44 +110,62 @@ class MainAnimationViewController: UIViewController {
 	
 	// Ефект натиску
 	@objc private func handleSingleTap(_ sender: UITapGestureRecognizer) {
-		guard let target = sender.view as? UIImageView else { return }
-		activeCar = target
+		guard let target = sender.view as? UIImageView,
+			  let id = target.accessibilityIdentifier,
+			  let index = carModels.firstIndex(where: { $0.id == id }) else { return }
+		activeCarId = id
 		vibrationGenerator.impactOccurred()
 		
+		var currentAngle = carModels[index].currentAngle
 		currentAngle += .pi / 2
 		if currentAngle >= .pi * 2 { currentAngle -= .pi * 2 }
 		
 		UIView.animate(withDuration: 0.3) {
-			target.transform = CGAffineTransform(rotationAngle: self.currentAngle)
-			self.rotationSlider.value = Float(self.currentAngle)
+			target.transform = CGAffineTransform(rotationAngle: currentAngle)
+			self.rotationSlider.value = Float(currentAngle)
 		}
 	}
 	
 	@objc private func handleTripleTap(_ sender: UISwipeGestureRecognizer) {
-		guard let target = sender.view as? UIImageView else { return }
+		guard let target = sender.view as? UIImageView,
+			  let id = target.accessibilityIdentifier else { return }
+		activeCarId = id
+		
 		UIView.animate(withDuration: 0.5, animations: {
 			target.transform = CGAffineTransform(scaleX: 0.01, y: 0.01)
 			target.alpha = 0
 		}) { _ in
 			target.removeFromSuperview()
-			self.imageCarViews.removeAll(where: { $0 == target })
+			self.carModels.removeAll(where: { $0.id == id })
+			
+			if self.activeCarId == id {
+				self.activeCarId = nil
+				self.rotationSlider.alpha = 0
+			}
 		}
 	}
 	
 	// Slider
 	@objc private func sliderChanged( _ sender: UISlider) {
-		currentAngle = CGFloat(sender.value)
-		activeCar?.transform = CGAffineTransform(rotationAngle: currentAngle)
+		guard let id = activeCarId,
+			  let index = carModels.firstIndex(where: { $0.id == id }) else { return }
+		
+		let newAngle = CGFloat(sender.value)
+		carModels[index].currentAngle = newAngle
+		carModels[index].image.transform = CGAffineTransform(rotationAngle: newAngle)
 	}
 	
 	// Ефект перетягування
 	@objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
-		guard let targetCar = gestureRecognizer.view as? UIImageView else { return }
+		guard let targetCar = gestureRecognizer.view as? UIImageView,
+			  let id = targetCar.accessibilityIdentifier,
+			  let index = carModels.firstIndex(where: { $0.id == id }) else { return }
+		
 		let location = gestureRecognizer.location(in: view)
 		
 		switch gestureRecognizer.state {
 		case.began:
-			activeCar = targetCar
+			activeCarId = id
 			let locationView = gestureRecognizer.location(in: targetCar)
 			offset = locationView
 
@@ -170,8 +188,7 @@ class MainAnimationViewController: UIViewController {
 			offset = nil
 			
 			UIView.animate(withDuration: 0.3, animations: {
-//				self.updateCarRotation()
-				targetCar.transform = CGAffineTransform(rotationAngle: self.currentAngle)
+				targetCar.transform = CGAffineTransform(rotationAngle: self.carModels[index].currentAngle)
 				targetCar.alpha = 1
 			})
 			
