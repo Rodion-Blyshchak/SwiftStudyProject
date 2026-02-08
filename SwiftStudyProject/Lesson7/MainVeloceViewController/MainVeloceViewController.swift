@@ -30,6 +30,7 @@ class MainVeloceViewController: UIViewController {
 			maxSpeed: 348,
 			acceleration: 2.3,
 			weight: 798,
+			isInFavorite: false,
 			
 		),
 		CarModel(
@@ -40,7 +41,8 @@ class MainVeloceViewController: UIViewController {
 			description: "The SF-24 is designed to be a significant departure from its predecessor, featuring a completely redesigned chassis and aerodynamic package. The focus was on making the car more consistent and easier to handle across different tracks and tyre compounds.",
 			maxSpeed: 345,
 			acceleration: 2.4,
-			weight: 798
+			weight: 798,
+			isInFavorite: false,
 		),
 		CarModel(
 			id: "dsfs",
@@ -50,7 +52,8 @@ class MainVeloceViewController: UIViewController {
 			description: "The W15 marks a return to a more conventional design philosophy after the team struggled with the zero sidepod concept. It features a new chassis and revised gearbox casing, aiming to establish a more stable foundation for aerodynamic development throughout the season.",
 			maxSpeed: 347,
 			acceleration: 2.4,
-			weight: 798
+			weight: 798,
+			isInFavorite: false,
 		),
 		CarModel(
 			id: "324fdswfd",
@@ -60,7 +63,8 @@ class MainVeloceViewController: UIViewController {
 			description: "The MCL38 is a refinement of the aggressive upgrade package introduced mid-season last year. The focus is on improving low-speed corner performance and optimizing the cooling systems for sustained high performance.",
 			maxSpeed: 342,
 			acceleration: 2.5,
-			weight: 798
+			weight: 798,
+			isInFavorite: false,
 		),
 		CarModel(
 			id: "dv",
@@ -70,7 +74,8 @@ class MainVeloceViewController: UIViewController {
 			description: "The A524 features a new chassis and suspension layout aimed at providing a wider operating window for the car's aerodynamics. It represents a long-term development push to return to the front of the midfield.",
 			maxSpeed: 338,
 			acceleration: 2.6,
-			weight: 798
+			weight: 798,
+			isInFavorite: false,
 		)
 	]
 	
@@ -85,7 +90,8 @@ class MainVeloceViewController: UIViewController {
 	
 	private let notificationManager = NotificationManager()
 	
-	private let storageManager = CarStorageManager()
+//	private let storageManager = CarStorageManager()
+	private let coreDataManager = CoreDataManager.shared
 	private lazy var isFavoriteFilterActive = false
 	
 	private lazy var Label: UILabel = {
@@ -168,7 +174,8 @@ class MainVeloceViewController: UIViewController {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
-		storageManager.delegate = self
+//		storageManager.delegate = self
+		loadInitialData()
 		setupHeaderButton()
 		setupHeaderView()
 		setupSearchView()
@@ -198,6 +205,27 @@ class MainVeloceViewController: UIViewController {
 		createNewCardButton.addTarget(self, action: #selector(addNewCrad), for: .touchUpInside)
 	}
 	
+	//MARK: - Func loadInitialData
+	private func loadInitialData() {
+		let saveCars = coreDataManager.fetchAllCars()
+		
+		if saveCars.isEmpty {
+			baseCar.forEach{coreDataManager.saveCar(model: $0)}
+		} else {
+			self.dataCars = saveCars
+		}
+		
+		update()
+	}
+	
+	private func update() {
+		self.listCellModel = dataCars.map {
+			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
+		}
+		self.filterDataCars = listCellModel
+		self.layoutView.reloadData()
+	}
+	
 	//MARK: - FavoriteFFilters
 	@objc private func toggleFavoriteFilter() {
 		isFavoriteFilterActive.toggle()
@@ -212,9 +240,7 @@ class MainVeloceViewController: UIViewController {
 		let filteredModels: [CarModel]
 		
 		if isFavoriteFilterActive {
-			filteredModels = dataCars.filter { car in
-				storageManager.isFavorite(id: car.id)
-			}
+			filteredModels = dataCars.filter { $0.isInFavorite }
 		} else {
 			filteredModels = dataCars
 		}
@@ -310,7 +336,6 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 	}
 }
 
-	// Тут я щось не впевнений чи норм зробив
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let selectedItem = filterDataCars [indexPath.item]
@@ -327,7 +352,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		let descriptionViewController = DescriptionCellVeloceViewController()
 		descriptionViewController.viewModel = detailModel
 		descriptionViewController.itemID = detailModel.id
-		descriptionViewController.favoriteStatus = storageManager.isFavorite(id: fullCarModel.id)
+		descriptionViewController.favoriteStatus = fullCarModel.isInFavorite
 		descriptionViewController.delegate = self
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
@@ -355,17 +380,22 @@ extension MainVeloceViewController: UISearchBarDelegate {
 
 extension MainVeloceViewController: AddCarViewDelegate {
 	func didAddNewCar(car: CarModel) {
-		let detailModel = CollectionViewCellViewModel(
-			id: car.id,
-			image: car.image,
-			title: car.name,
-			subTitle: car.team
-		)
+//		let detailModel = CollectionViewCellViewModel(
+//			id: car.id,
+//			image: car.image,
+//			title: car.name,
+//			subTitle: car.team
+//		)
+//		
+//		self.dataCars.append(car)
+//		self.listCellModel.append(detailModel)
+//		self.filterDataCars = listCellModel
+//		self.layoutView.reloadData()
 		
-		self.dataCars.append(car)
-		self.listCellModel.append(detailModel)
-		self.filterDataCars = listCellModel
-		self.layoutView.reloadData()
+		coreDataManager.saveCar(model: car)
+		
+		self.dataCars = coreDataManager.fetchAllCars()
+		update()
 	}
 }
 
@@ -381,10 +411,17 @@ extension MainVeloceViewController: NotificationManagerDelegate {
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: String) {
-		storageManager.isFavorite(id: id) ? storageManager.remove(id: id) : storageManager.add(id: id)
-		
-		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
-			currentDetailVC.updateFavoriteStatus(isFavorite: storageManager.isFavorite(id: id))
+		if let index = dataCars.firstIndex(where: { $0.id == id }) {
+			dataCars[index].isInFavorite.toggle()
+			coreDataManager.saveCar(model: dataCars[index])
+			
+			if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
+				currentDetailVC.updateFavoriteStatus(isFavorite: dataCars[index].isInFavorite)
+			}
+			
+			if isFavoriteFilterActive {
+				filterFavorites()
+			}
 		}
 	}
 }

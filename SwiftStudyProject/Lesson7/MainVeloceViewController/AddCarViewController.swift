@@ -183,7 +183,8 @@ class AddCarViewController: UIViewController {
 			description: description,
 			maxSpeed: 0,
 			acceleration: Float(accelerationTextField.text ?? "") ?? 0.0,
-			weight: Int(weightTextField.text ?? "") ?? 0
+			weight: Int(weightTextField.text ?? "") ?? 0,
+			isInFavorite: false
 		)
 		
 		let keys = [
