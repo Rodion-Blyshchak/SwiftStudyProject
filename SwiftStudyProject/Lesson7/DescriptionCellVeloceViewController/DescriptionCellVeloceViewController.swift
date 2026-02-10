@@ -13,7 +13,7 @@ protocol DescriptionCellVeloceViewControllerDelegate {
 
 class DescriptionCellVeloceViewController: UIViewController {
 	enum ConstantsSize {
-		static let imageHeightAnchor: CGFloat = 260
+		static let imageHeightAnchor: CGFloat = 300
 		static let buttonHeightAnchor: CGFloat = 50
 		static let buttonWidthAnchor: CGFloat = 50
 		static let mainIndent: CGFloat = 16
@@ -33,6 +33,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		image.translatesAutoresizingMaskIntoConstraints = false
 		image.contentMode = .scaleAspectFill
 		image.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		image.clipsToBounds = true
 		return image
 	}()
 	
@@ -142,7 +143,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		view.addSubview(mainInfoStackView)
 		
 		NSLayoutConstraint.activate([
-			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 80),
+			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
 			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			mainInfoStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])

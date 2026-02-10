@@ -20,7 +20,7 @@ class MainVeloceViewController: UIViewController {
 		static let spacing: CGFloat = 4
 	}
 	
-	lazy var baseCar: [CarModel] = [
+	lazy var baseCarModels: [CarModel] = [
 		CarModel(
 			id: "1welkmcs",
 			image: UIImage(named: "Red Bull RB20") ?? UIImage(systemName: "car.fill")!,
@@ -29,9 +29,7 @@ class MainVeloceViewController: UIViewController {
 			description: "The RB20 represents an evolution of its dominant predecessor, featuring aggressive sidepod and engine cover changes aimed at maximizing ground effect efficiency and top speed. It retains the philosophy of minimizing aerodynamic drag while providing exceptional stability.",
 			maxSpeed: 348,
 			acceleration: 2.3,
-			weight: 798,
-			isInFavorite: false,
-			
+			weight: 798
 		),
 		CarModel(
 			id: "1welkmddcs",
@@ -41,8 +39,7 @@ class MainVeloceViewController: UIViewController {
 			description: "The SF-24 is designed to be a significant departure from its predecessor, featuring a completely redesigned chassis and aerodynamic package. The focus was on making the car more consistent and easier to handle across different tracks and tyre compounds.",
 			maxSpeed: 345,
 			acceleration: 2.4,
-			weight: 798,
-			isInFavorite: false,
+			weight: 798
 		),
 		CarModel(
 			id: "dsfs",
@@ -52,8 +49,7 @@ class MainVeloceViewController: UIViewController {
 			description: "The W15 marks a return to a more conventional design philosophy after the team struggled with the zero sidepod concept. It features a new chassis and revised gearbox casing, aiming to establish a more stable foundation for aerodynamic development throughout the season.",
 			maxSpeed: 347,
 			acceleration: 2.4,
-			weight: 798,
-			isInFavorite: false,
+			weight: 798
 		),
 		CarModel(
 			id: "324fdswfd",
@@ -63,8 +59,7 @@ class MainVeloceViewController: UIViewController {
 			description: "The MCL38 is a refinement of the aggressive upgrade package introduced mid-season last year. The focus is on improving low-speed corner performance and optimizing the cooling systems for sustained high performance.",
 			maxSpeed: 342,
 			acceleration: 2.5,
-			weight: 798,
-			isInFavorite: false,
+			weight: 798
 		),
 		CarModel(
 			id: "dv",
@@ -74,15 +69,14 @@ class MainVeloceViewController: UIViewController {
 			description: "The A524 features a new chassis and suspension layout aimed at providing a wider operating window for the car's aerodynamics. It represents a long-term development push to return to the front of the midfield.",
 			maxSpeed: 338,
 			acceleration: 2.6,
-			weight: 798,
-			isInFavorite: false,
+			weight: 798
 		)
 	]
 	
 	//MARK: - Properties
-	private lazy var dataCars: [CarModel] = baseCar
+	private lazy var dataCars: [CarModel] = baseCarModels
 	
-	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCar).items
+	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCarModels).items
 	
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
@@ -164,7 +158,7 @@ class MainVeloceViewController: UIViewController {
 	}()
 	
 	//MARK: - ViewDidLoad
-	override func viewDidLoad() {
+	override func viewDidLoad() {	
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
@@ -207,23 +201,19 @@ class MainVeloceViewController: UIViewController {
 	
 	//MARK: - Func loadInitialData
 	private func loadInitialData() {
-		let saveCars = coreDataManager.fetchAllCars()
+		let savedCars = coreDataManager.fetchAllCars()
 		
-		if saveCars.isEmpty {
-			baseCar.forEach{coreDataManager.saveCar(model: $0)}
-		} else {
-			self.dataCars = saveCars
-		}
+		savedCars.isEmpty ? baseCarModels.forEach{coreDataManager.saveCar(model: $0)} : (dataCars = savedCars)
 		
 		update()
 	}
 	
 	private func update() {
-		self.listCellModel = dataCars.map {
+		listCellModel = dataCars.map {
 			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
 		}
-		self.filterDataCars = listCellModel
-		self.layoutView.reloadData()
+		filterDataCars = listCellModel
+		layoutView.reloadData()
 	}
 	
 	//MARK: - FavoriteFFilters
@@ -238,12 +228,7 @@ class MainVeloceViewController: UIViewController {
 	
 	private func filterFavorites() {
 		let filteredModels: [CarModel]
-		
-		if isFavoriteFilterActive {
-			filteredModels = dataCars.filter { $0.isInFavorite }
-		} else {
-			filteredModels = dataCars
-		}
+		filteredModels = isFavoriteFilterActive ? dataCars.filter { $0.isInFavorite } : dataCars
 		
 		filterDataCars = filteredModels.map {
 			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
@@ -380,21 +365,9 @@ extension MainVeloceViewController: UISearchBarDelegate {
 
 extension MainVeloceViewController: AddCarViewDelegate {
 	func didAddNewCar(car: CarModel) {
-//		let detailModel = CollectionViewCellViewModel(
-//			id: car.id,
-//			image: car.image,
-//			title: car.name,
-//			subTitle: car.team
-//		)
-//		
-//		self.dataCars.append(car)
-//		self.listCellModel.append(detailModel)
-//		self.filterDataCars = listCellModel
-//		self.layoutView.reloadData()
-		
 		coreDataManager.saveCar(model: car)
 		
-		self.dataCars = coreDataManager.fetchAllCars()
+		dataCars = coreDataManager.fetchAllCars()
 		update()
 	}
 }

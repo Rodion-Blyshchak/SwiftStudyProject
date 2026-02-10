@@ -8,9 +8,9 @@
 import UIKit
 import CoreData
 
-class CoreDataManager {
+final class CoreDataManager {
 	static let shared = CoreDataManager()
-	init() {}
+	private init() {}
 	
 	private var appDelegate: AppDelegate {
 		UIApplication.shared.delegate as! AppDelegate
@@ -35,8 +35,10 @@ class CoreDataManager {
 				entity.id = model.id
 			}
 			
+			if let imageData = model.image.jpegData(compressionQuality: 0.8) {
+				entity.image = imageData
+			}
 			entity.name = model.name
-			entity.image = model.name // Як працювати з картинками?
 			entity.team = model.team
 			entity.carDescription = model.description
 			entity.maxSpead = Int16(model.maxSpeed)
@@ -73,7 +75,7 @@ class CoreDataManager {
 				guard let id = entity.id else { return nil }
 				return CarModel(
 					id: id,
-					image: UIImage(named: entity.image ?? "Neon orange glasses on silhouette profile") ?? UIImage(),
+					image: UIImage(data: entity.image ?? Data()) ?? UIImage(systemName: "Neon orange glasses on silhouette profile")!,
 					name: entity.name ?? "",
 					team: entity.team ?? "",
 					description: entity.carDescription ?? "",
