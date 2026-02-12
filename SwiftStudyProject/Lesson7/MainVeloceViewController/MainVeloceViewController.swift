@@ -158,7 +158,7 @@ class MainVeloceViewController: UIViewController {
 	}()
 	
 	//MARK: - ViewDidLoad
-	override func viewDidLoad() {	
+	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		let tapOutsideKeyboard = UITapGestureRecognizer(target: view, action: #selector(UIView.endEditing))
@@ -316,7 +316,9 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
 		let itemData = filterDataCars [indexPath.item]
+		
 		cell.configure(with: itemData)
+		cell.delegate = self
 		return cell
 	}
 }
@@ -341,6 +343,14 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		descriptionViewController.delegate = self
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
+	}
+}
+
+extension MainVeloceViewController: CollectionCellDelegate {
+	func didDeleteCellButton(with id: String) {
+		coreDataManager.deleteCar(id: id)
+		dataCars.removeAll { $0.id == id }
+		update()
 	}
 }
 
