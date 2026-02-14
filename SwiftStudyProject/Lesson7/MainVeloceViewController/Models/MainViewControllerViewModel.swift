@@ -14,7 +14,7 @@ struct MainViewControllerViewModel {
 		items = dataCars.map { model in
 			CollectionViewCellViewModel(
 				id: model.id,
-				image: model.image,
+				image: (model.image ?? UIImage(named: "Default_image")) ?? UIImage(),
 				title: model.name,
 				subTitle: model.team
 			)

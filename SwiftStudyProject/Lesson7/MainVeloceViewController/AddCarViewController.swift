@@ -180,7 +180,7 @@ class AddCarViewController: UIViewController {
 		
 		let newCardModel = CarModel(
 			id: UUID().uuidString,
-			image: imageView.image ?? UIImage(named: "Neon orange glasses on silhouette profile")!,
+			image: imageView.image ?? UIImage(named: "Default_image"),
 			name: modelTextField.text ?? "",
 			team: brandTextField.text ?? "",
 			description: description,

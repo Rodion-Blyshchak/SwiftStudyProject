@@ -9,7 +9,7 @@ import UIKit
 
 struct CarModel {
 	let id: String
-	let image: UIImage
+	let image: UIImage?
 	let name: String
 	let team: String
 	let description: String

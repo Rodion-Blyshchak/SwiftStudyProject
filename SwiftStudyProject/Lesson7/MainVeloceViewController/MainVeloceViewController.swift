@@ -210,7 +210,12 @@ class MainVeloceViewController: UIViewController {
 	
 	private func update() {
 		listCellModel = dataCars.map {
-			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
+			CollectionViewCellViewModel(
+				id: $0.id,
+				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				title: $0.name,
+				subTitle: $0.team
+			)
 		}
 		filterDataCars = listCellModel
 		layoutView.reloadData()
@@ -231,7 +236,12 @@ class MainVeloceViewController: UIViewController {
 		filteredModels = isFavoriteFilterActive ? dataCars.filter { $0.isInFavorite } : dataCars
 		
 		filterDataCars = filteredModels.map {
-			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
+			CollectionViewCellViewModel(
+				id: $0.id,
+				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				title: $0.name,
+				subTitle: $0.team
+			)
 		}
 		layoutView.reloadData()
 	}
@@ -330,7 +340,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
-			image: fullCarModel.image,
+			image: (fullCarModel.image ?? UIImage(named: "Default_image")) ?? UIImage(),
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
 			description: fullCarModel.description

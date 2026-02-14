@@ -35,7 +35,7 @@ final class CoreDataManager {
 				entity.id = model.id
 			}
 			
-			if let imageData = model.image.jpegData(compressionQuality: 0.8) {
+			if let imageData = model.image?.jpegData(compressionQuality: 0.8) {
 				entity.image = imageData
 			}
 			entity.name = model.name
@@ -75,7 +75,7 @@ final class CoreDataManager {
 				guard let id = entity.id else { return nil }
 				return CarModel(
 					id: id,
-					image: UIImage(data: entity.image ?? Data()) ?? UIImage(systemName: "Neon orange glasses on silhouette profile")!,
+					image: UIImage(data: entity.image ?? Data()),
 					name: entity.name ?? "",
 					team: entity.team ?? "",
 					description: entity.carDescription ?? "",
