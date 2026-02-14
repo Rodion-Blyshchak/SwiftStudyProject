@@ -136,8 +136,11 @@ class AddCarViewController: UIViewController {
 		guard let activeView = stackView.arrangedSubviews.first(where: { $0.isFirstResponder}) else { return }
 		let coordinates = stackView.convert(activeView.frame, to: scrollView)
 		let visibleHeight = (scrollView.frame.height - scrollView.contentInset.bottom) - ConstantsSize.mainIndent
-		let offset = CGPoint(x: 0, y: coordinates.maxY - visibleHeight)
-		scrollView.setContentOffset(offset, animated: true)
+		
+		if coordinates.maxY > (scrollView.contentOffset.y + visibleHeight) {
+			let offset = CGPoint(x: 0, y: coordinates.maxY - visibleHeight)
+			scrollView.setContentOffset(offset, animated: true)
+		}
 	}
 	
 	//MARK: - Func didTapAddPhoto
@@ -177,7 +180,7 @@ class AddCarViewController: UIViewController {
 		
 		let newCardModel = CarModel(
 			id: UUID().uuidString,
-			image: imageView.image ?? UIImage(named: "Neon orange glasses on silhouette profile")!,
+			image: imageView.image ?? UIImage(named: "Default_image"),
 			name: modelTextField.text ?? "",
 			team: brandTextField.text ?? "",
 			description: description,

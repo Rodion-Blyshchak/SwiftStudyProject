@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol CollectionCellDelegate {
+	func didDeleteCellButton(with id: String)
+}
+
 class CollectionCell: UICollectionViewCell {
 	enum ConstantsSize {
 		static let heightView: CGFloat = 120
@@ -19,6 +23,9 @@ class CollectionCell: UICollectionViewCell {
 	}
 	
 	static let reuseId = "CollectionCell"
+	
+	var delegate: CollectionCellDelegate?
+	var itemID: String?
 	
 	private let imageView: UIImageView = {
 		let imageView = UIImageView()
@@ -57,9 +64,21 @@ class CollectionCell: UICollectionViewCell {
 		return stackView
 	}()
 	
+	private let deleteCellButton: UIButton = {
+		let button = UIButton()
+		button.translatesAutoresizingMaskIntoConstraints = false
+		button.setImage(UIImage(systemName: "xmark"), for: .normal)
+		button.heightAnchor.constraint(equalToConstant: 20).isActive = true
+		button.widthAnchor.constraint(equalToConstant: 20).isActive = true
+		button.tintColor = .appRed
+		button.addTarget(self, action: #selector(didTapDelete), for: .touchUpInside)
+		return button
+	}()
+	
 	override init(frame: CGRect) {
 		super.init(frame: frame)
 		setupView()
+		setupDeleteCellButton()
 	}
 	
 	required init?(coder: NSCoder) {
@@ -83,7 +102,23 @@ class CollectionCell: UICollectionViewCell {
 		])
 	}
 	
+	private func setupDeleteCellButton() {
+		contentView.addSubview(deleteCellButton)
+		
+		NSLayoutConstraint.activate([
+			deleteCellButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+			deleteCellButton.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8)
+		])
+		contentView.bringSubviewToFront(deleteCellButton)
+	}
+	
+	@objc func didTapDelete() {
+		guard let id = itemID else { return }
+		delegate?.didDeleteCellButton(with: id)
+	}
+	
 	func configure(with item: CollectionViewCellViewModel) {
+		itemID = item.id
 		imageView.image = item.image
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()

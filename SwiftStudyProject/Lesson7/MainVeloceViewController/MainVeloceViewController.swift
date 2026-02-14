@@ -20,7 +20,7 @@ class MainVeloceViewController: UIViewController {
 		static let spacing: CGFloat = 4
 	}
 	
-	lazy var baseCar: [CarModel] = [
+	lazy var baseCarModels: [CarModel] = [
 		CarModel(
 			id: "1welkmcs",
 			image: UIImage(named: "Red Bull RB20") ?? UIImage(systemName: "car.fill")!,
@@ -29,8 +29,7 @@ class MainVeloceViewController: UIViewController {
 			description: "The RB20 represents an evolution of its dominant predecessor, featuring aggressive sidepod and engine cover changes aimed at maximizing ground effect efficiency and top speed. It retains the philosophy of minimizing aerodynamic drag while providing exceptional stability.",
 			maxSpeed: 348,
 			acceleration: 2.3,
-			weight: 798,
-			
+			weight: 798
 		),
 		CarModel(
 			id: "1welkmddcs",
@@ -75,9 +74,9 @@ class MainVeloceViewController: UIViewController {
 	]
 	
 	//MARK: - Properties
-	private lazy var dataCars: [CarModel] = baseCar
+	private lazy var dataCars: [CarModel] = baseCarModels
 	
-	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCar).items
+	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCarModels).items
 	
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
@@ -85,7 +84,8 @@ class MainVeloceViewController: UIViewController {
 	
 	private let notificationManager = NotificationManager()
 	
-	private let storageManager = CarStorageManager()
+//	private let storageManager = CarStorageManager()
+	private let coreDataManager = CoreDataManager.shared
 	private lazy var isFavoriteFilterActive = false
 	
 	private lazy var Label: UILabel = {
@@ -168,7 +168,8 @@ class MainVeloceViewController: UIViewController {
 		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
-		storageManager.delegate = self
+//		storageManager.delegate = self
+		loadInitialData()
 		setupHeaderButton()
 		setupHeaderView()
 		setupSearchView()
@@ -198,6 +199,28 @@ class MainVeloceViewController: UIViewController {
 		createNewCardButton.addTarget(self, action: #selector(addNewCrad), for: .touchUpInside)
 	}
 	
+	//MARK: - Func loadInitialData
+	private func loadInitialData() {
+		let savedCars = coreDataManager.fetchAllCars()
+		
+		savedCars.isEmpty ? baseCarModels.forEach{coreDataManager.saveCar(model: $0)} : (dataCars = savedCars)
+		
+		update()
+	}
+	
+	private func update() {
+		listCellModel = dataCars.map {
+			CollectionViewCellViewModel(
+				id: $0.id,
+				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				title: $0.name,
+				subTitle: $0.team
+			)
+		}
+		filterDataCars = listCellModel
+		layoutView.reloadData()
+	}
+	
 	//MARK: - FavoriteFFilters
 	@objc private func toggleFavoriteFilter() {
 		isFavoriteFilterActive.toggle()
@@ -210,17 +233,15 @@ class MainVeloceViewController: UIViewController {
 	
 	private func filterFavorites() {
 		let filteredModels: [CarModel]
-		
-		if isFavoriteFilterActive {
-			filteredModels = dataCars.filter { car in
-				storageManager.isFavorite(id: car.id)
-			}
-		} else {
-			filteredModels = dataCars
-		}
+		filteredModels = isFavoriteFilterActive ? dataCars.filter { $0.isInFavorite } : dataCars
 		
 		filterDataCars = filteredModels.map {
-			CollectionViewCellViewModel(id: $0.id, image: $0.image, title: $0.name, subTitle: $0.team)
+			CollectionViewCellViewModel(
+				id: $0.id,
+				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				title: $0.name,
+				subTitle: $0.team
+			)
 		}
 		layoutView.reloadData()
 	}
@@ -305,12 +326,13 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 	func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
 		let itemData = filterDataCars [indexPath.item]
+		
 		cell.configure(with: itemData)
+		cell.delegate = self
 		return cell
 	}
 }
 
-	// Тут я щось не впевнений чи норм зробив
 extension MainVeloceViewController: UICollectionViewDelegate {
 	func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
 		let selectedItem = filterDataCars [indexPath.item]
@@ -318,7 +340,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
-			image: fullCarModel.image,
+			image: (fullCarModel.image ?? UIImage(named: "Default_image")) ?? UIImage(),
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
 			description: fullCarModel.description
@@ -327,10 +349,18 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		let descriptionViewController = DescriptionCellVeloceViewController()
 		descriptionViewController.viewModel = detailModel
 		descriptionViewController.itemID = detailModel.id
-		descriptionViewController.favoriteStatus = storageManager.isFavorite(id: fullCarModel.id)
+		descriptionViewController.favoriteStatus = fullCarModel.isInFavorite
 		descriptionViewController.delegate = self
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
+	}
+}
+
+extension MainVeloceViewController: CollectionCellDelegate {
+	func didDeleteCellButton(with id: String) {
+		coreDataManager.deleteCar(id: id)
+		dataCars.removeAll { $0.id == id }
+		update()
 	}
 }
 
@@ -355,17 +385,10 @@ extension MainVeloceViewController: UISearchBarDelegate {
 
 extension MainVeloceViewController: AddCarViewDelegate {
 	func didAddNewCar(car: CarModel) {
-		let detailModel = CollectionViewCellViewModel(
-			id: car.id,
-			image: car.image,
-			title: car.name,
-			subTitle: car.team
-		)
+		coreDataManager.saveCar(model: car)
 		
-		self.dataCars.append(car)
-		self.listCellModel.append(detailModel)
-		self.filterDataCars = listCellModel
-		self.layoutView.reloadData()
+		dataCars = coreDataManager.fetchAllCars()
+		update()
 	}
 }
 
@@ -381,10 +404,17 @@ extension MainVeloceViewController: NotificationManagerDelegate {
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: String) {
-		storageManager.isFavorite(id: id) ? storageManager.remove(id: id) : storageManager.add(id: id)
-		
-		if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
-			currentDetailVC.updateFavoriteStatus(isFavorite: storageManager.isFavorite(id: id))
+		if let index = dataCars.firstIndex(where: { $0.id == id }) {
+			dataCars[index].isInFavorite.toggle()
+			coreDataManager.saveCar(model: dataCars[index])
+			
+			if let currentDetailVC = navigationController?.topViewController as? DescriptionCellVeloceViewController {
+				currentDetailVC.updateFavoriteStatus(isFavorite: dataCars[index].isInFavorite)
+			}
+			
+			if isFavoriteFilterActive {
+				filterFavorites()
+			}
 		}
 	}
 }

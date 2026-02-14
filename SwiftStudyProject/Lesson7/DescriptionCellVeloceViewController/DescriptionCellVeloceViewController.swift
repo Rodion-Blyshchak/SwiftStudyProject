@@ -33,6 +33,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		image.translatesAutoresizingMaskIntoConstraints = false
 		image.contentMode = .scaleAspectFill
 		image.heightAnchor.constraint(equalToConstant: ConstantsSize.imageHeightAnchor).isActive = true
+		image.clipsToBounds = true
 		return image
 	}()
 	
