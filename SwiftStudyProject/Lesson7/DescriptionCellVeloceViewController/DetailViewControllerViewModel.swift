@@ -8,8 +8,8 @@
 import UIKit
 
 struct DetailViewControllerViewModel {
-	let id: String
-	let image: UIImage
+	let id: Int
+	let image: String
 	let title: String
 	let subTitle: String
 	let description: String

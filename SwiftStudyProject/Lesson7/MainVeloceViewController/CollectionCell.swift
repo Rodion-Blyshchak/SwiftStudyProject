@@ -8,7 +8,7 @@
 import UIKit
 
 protocol CollectionCellDelegate {
-	func didDeleteCellButton(with id: String)
+	func didDeleteCellButton(with id: Int)
 }
 
 class CollectionCell: UICollectionViewCell {
@@ -25,7 +25,7 @@ class CollectionCell: UICollectionViewCell {
 	static let reuseId = "CollectionCell"
 	
 	var delegate: CollectionCellDelegate?
-	var itemID: String?
+	var itemID: Int?
 	
 	private let imageView: UIImageView = {
 		let imageView = UIImageView()
@@ -119,7 +119,7 @@ class CollectionCell: UICollectionViewCell {
 	
 	func configure(with item: CollectionViewCellViewModel) {
 		itemID = item.id
-		imageView.image = item.image
+//		imageView.image = item.image
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()
 	}

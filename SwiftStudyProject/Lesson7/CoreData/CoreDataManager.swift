@@ -22,7 +22,7 @@ final class CoreDataManager {
 
 	func saveCar(model: CarModel) {
 		let fetchRequest: NSFetchRequest<CarEntity> = CarEntity.fetchRequest()
-		fetchRequest.predicate = NSPredicate(format: "id == %@", model.id)
+		fetchRequest.predicate = NSPredicate(format: "id == %d", model.id)
 		
 		do {
 			let results = try context.fetch(fetchRequest)	
@@ -32,12 +32,12 @@ final class CoreDataManager {
 				entity = existingCar
 			} else {
 				entity = CarEntity(context: context)
-				entity.id = model.id
+				entity.id = Int64(model.id)
 			}
 			
-			if let imageData = model.image?.jpegData(compressionQuality: 0.8) {
-				entity.image = imageData
-			}
+//			if let imageData = model.image?.jpegData(compressionQuality: 0.8) {
+//				entity.image = imageData
+//			}
 			entity.name = model.name
 			entity.team = model.team
 			entity.carDescription = model.description
@@ -52,9 +52,9 @@ final class CoreDataManager {
 		}
 	}
 	
-	func deleteCar(id: String) {
+	func deleteCar(id: Int) {
 		let fetchRequest: NSFetchRequest<CarEntity> = CarEntity.fetchRequest()
-		fetchRequest.predicate = NSPredicate(format: "id == %@", id)
+		fetchRequest.predicate = NSPredicate(format: "id == %d", id)
 		
 		do {
 			let results = try context.fetch(fetchRequest)
@@ -72,13 +72,13 @@ final class CoreDataManager {
 		do {
 			let entities = try context.fetch(fetchRequest)
 			return entities.compactMap{ (entity: CarEntity) -> CarModel? in
-				guard let id = entity.id else { return nil }
+//				guard let id = entity.id else { return nil}
 				return CarModel(
-					id: id,
-					image: UIImage(data: entity.image ?? Data()),
+					id: Int(entity.id),
+					image: "",
 					name: entity.name ?? "",
 					team: entity.team ?? "",
-					description: entity.carDescription ?? "",
+//					description: entity.carDescription,
 					maxSpeed: Int(entity.maxSpead),
 					acceleration: entity.acceleration,
 					weight: Int(entity.weight),

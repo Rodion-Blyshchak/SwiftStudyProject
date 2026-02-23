@@ -20,63 +20,10 @@ class MainVeloceViewController: UIViewController {
 		static let spacing: CGFloat = 4
 	}
 	
-	lazy var baseCarModels: [CarModel] = [
-		CarModel(
-			id: "1welkmcs",
-			image: UIImage(named: "Red Bull RB20") ?? UIImage(systemName: "car.fill")!,
-			name: "RB20",
-			team: "Red Bull Racing",
-			description: "The RB20 represents an evolution of its dominant predecessor, featuring aggressive sidepod and engine cover changes aimed at maximizing ground effect efficiency and top speed. It retains the philosophy of minimizing aerodynamic drag while providing exceptional stability.",
-			maxSpeed: 348,
-			acceleration: 2.3,
-			weight: 798
-		),
-		CarModel(
-			id: "1welkmddcs",
-			image: UIImage(named: "Ferrari SF-24") ?? UIImage(systemName: "car.fill")!,
-			name: "SF-24",
-			team: "Scuderia Ferrari",
-			description: "The SF-24 is designed to be a significant departure from its predecessor, featuring a completely redesigned chassis and aerodynamic package. The focus was on making the car more consistent and easier to handle across different tracks and tyre compounds.",
-			maxSpeed: 345,
-			acceleration: 2.4,
-			weight: 798
-		),
-		CarModel(
-			id: "dsfs",
-			image: UIImage(named: "Mercedes W15") ?? UIImage(systemName: "car.fill")!,
-			name: "W15",
-			team: "Mercedes-AMG PETRONAS",
-			description: "The W15 marks a return to a more conventional design philosophy after the team struggled with the zero sidepod concept. It features a new chassis and revised gearbox casing, aiming to establish a more stable foundation for aerodynamic development throughout the season.",
-			maxSpeed: 347,
-			acceleration: 2.4,
-			weight: 798
-		),
-		CarModel(
-			id: "324fdswfd",
-			image: UIImage(named: "McLaren MCL38") ?? UIImage(systemName: "car.fill")!,
-			name: "MCL38",
-			team: "McLaren Formula 1 Team",
-			description: "The MCL38 is a refinement of the aggressive upgrade package introduced mid-season last year. The focus is on improving low-speed corner performance and optimizing the cooling systems for sustained high performance.",
-			maxSpeed: 342,
-			acceleration: 2.5,
-			weight: 798
-		),
-		CarModel(
-			id: "dv",
-			image: UIImage(named: "Alpine A524") ?? UIImage(systemName: "car.fill")!,
-			name: "A524",
-			team: "Alpine F1 Team",
-			description: "The A524 features a new chassis and suspension layout aimed at providing a wider operating window for the car's aerodynamics. It represents a long-term development push to return to the front of the midfield.",
-			maxSpeed: 338,
-			acceleration: 2.6,
-			weight: 798
-		)
-	]
-	
 	//MARK: - Properties
-	private lazy var dataCars: [CarModel] = baseCarModels
+	private lazy var dataCars: [CarModel] = []
 	
-	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: baseCarModels).items
+	private lazy var listCellModel: [CollectionViewCellViewModel] = MainViewControllerViewModel(dataCars: dataCars).items
 	
 	private lazy var searchController = UISearchBar()
 	private lazy var filterDataCars: [CollectionViewCellViewModel] = listCellModel
@@ -202,8 +149,14 @@ class MainVeloceViewController: UIViewController {
 	//MARK: - Func loadInitialData
 	private func loadInitialData() {
 		let savedCars = coreDataManager.fetchAllCars()
+		let jsonCars = NetworkManager.shared.fetchData() ?? []
 		
-		savedCars.isEmpty ? baseCarModels.forEach{coreDataManager.saveCar(model: $0)} : (dataCars = savedCars)
+		if savedCars.isEmpty {
+			jsonCars.forEach{coreDataManager.saveCar(model: $0)}
+			dataCars = coreDataManager.fetchAllCars()
+		} else {
+			dataCars = savedCars
+		}
 		
 		update()
 	}
@@ -212,7 +165,8 @@ class MainVeloceViewController: UIViewController {
 		listCellModel = dataCars.map {
 			CollectionViewCellViewModel(
 				id: $0.id,
-				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				image: "",
+//				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -238,7 +192,7 @@ class MainVeloceViewController: UIViewController {
 		filterDataCars = filteredModels.map {
 			CollectionViewCellViewModel(
 				id: $0.id,
-				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				image: "",
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -340,10 +294,10 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
-			image: (fullCarModel.image ?? UIImage(named: "Default_image")) ?? UIImage(),
+			image: "",
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
-			description: fullCarModel.description
+			description: fullCarModel.description ?? ""
 		)
 
 		let descriptionViewController = DescriptionCellVeloceViewController()
@@ -357,7 +311,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 }
 
 extension MainVeloceViewController: CollectionCellDelegate {
-	func didDeleteCellButton(with id: String) {
+	func didDeleteCellButton(with id: Int) {
 		coreDataManager.deleteCar(id: id)
 		dataCars.removeAll { $0.id == id }
 		update()
@@ -403,7 +357,7 @@ extension MainVeloceViewController: NotificationManagerDelegate {
 }
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
-	func didTapFavoriteAction(id: String) {
+	func didTapFavoriteAction(id: Int) {
 		if let index = dataCars.firstIndex(where: { $0.id == id }) {
 			dataCars[index].isInFavorite.toggle()
 			coreDataManager.saveCar(model: dataCars[index])

@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DescriptionCellVeloceViewControllerDelegate {
-	func didTapFavoriteAction(id: String)
+	func didTapFavoriteAction(id: Int)
 }
 
 class DescriptionCellVeloceViewController: UIViewController {
@@ -26,7 +26,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	//MARK: - Properties
 	var viewModel: DetailViewControllerViewModel?
 	var delegate: DescriptionCellVeloceViewControllerDelegate?
-	var itemID: String?
+	var itemID: Int?
 	
 	private let imageView: UIImageView = {
 		let image = UIImageView()
@@ -122,7 +122,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	private func setupTopContent() {
 		guard let viewModel else { return }
 		
-		imageView.image = viewModel.image
+//		imageView.image = viewModel.image
 		
 		view.addSubview(imageView)
 		
