@@ -119,8 +119,12 @@ class CollectionCell: UICollectionViewCell {
 	
 	func configure(with item: CollectionViewCellViewModel) {
 		itemID = item.id
-//		imageView.image = item.image
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()
+		
+		imageView.image = UIImage(named: "Default_image")
+		guard let url = URL(string: item.image) else { return }
+		NetworkManager.shared.getDataImages(from: url) { [weak self] downloadedImage in
+			self?.imageView.image = downloadedImage }	
 	}
 }

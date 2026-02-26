@@ -120,11 +120,14 @@ class DescriptionCellVeloceViewController: UIViewController {
 	
 	//MARK: - Setup
 	private func setupTopContent() {
+		view.addSubview(imageView)
+		
 		guard let viewModel else { return }
 		
-//		imageView.image = viewModel.image
-		
-		view.addSubview(imageView)
+		imageView.image = UIImage(named: "Default_image")
+		guard let url = URL(string: viewModel.image) else { return }
+		NetworkManager.shared.getDataImages(from: url) { [weak self] downloadedImage in
+			self?.imageView.image = downloadedImage }
 		
 		NSLayoutConstraint.activate([
 			imageView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -134,14 +137,14 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	private func setupTitle() {
-		guard let viewModel else { return } // повторюється!
-		
-		nameCarLabel.text = viewModel.title
-		teamCarLabel.text = viewModel.subTitle.uppercased()
 		mainInfoStackView.addArrangedSubview(nameCarLabel)
 		mainInfoStackView.addArrangedSubview(teamCarLabel)
 		view.addSubview(mainInfoStackView)
 		
+		guard let viewModel else { return } // повторюється!
+		nameCarLabel.text = viewModel.title
+		teamCarLabel.text = viewModel.subTitle.uppercased()
+	
 		NSLayoutConstraint.activate([
 			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
 			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
@@ -150,10 +153,10 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	private func setupdescription() {
-		guard let viewModel else { return }
-		
-		carDescriptionLabel.text = viewModel.description
 		view.addSubview(carDescriptionLabel)
+		
+		guard let viewModel else { return }
+		carDescriptionLabel.text = viewModel.description
 		
 		NSLayoutConstraint.activate([
 			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),

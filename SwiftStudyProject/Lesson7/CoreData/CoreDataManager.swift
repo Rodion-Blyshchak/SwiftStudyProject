@@ -35,10 +35,8 @@ final class CoreDataManager {
 				entity.id = Int64(model.id)
 			}
 			
-//			if let imageData = model.image?.jpegData(compressionQuality: 0.8) {
-//				entity.image = imageData
-//			}
 			entity.name = model.name
+			entity.image = model.image
 			entity.team = model.team
 			entity.carDescription = model.description
 			entity.maxSpead = Int16(model.maxSpeed)
@@ -75,7 +73,7 @@ final class CoreDataManager {
 //				guard let id = entity.id else { return nil}
 				return CarModel(
 					id: Int(entity.id),
-					image: "",
+					image: entity.image,
 					name: entity.name ?? "",
 					team: entity.team ?? "",
 //					description: entity.carDescription,

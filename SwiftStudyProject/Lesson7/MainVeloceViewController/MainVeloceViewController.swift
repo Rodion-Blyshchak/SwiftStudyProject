@@ -149,7 +149,7 @@ class MainVeloceViewController: UIViewController {
 	//MARK: - Func loadInitialData
 	private func loadInitialData() {
 		let savedCars = coreDataManager.fetchAllCars()
-		let jsonCars = NetworkManager.shared.fetchData() ?? []
+		let jsonCars = NetworkManager.shared.fetchData()
 		
 		if savedCars.isEmpty {
 			jsonCars.forEach{coreDataManager.saveCar(model: $0)}
@@ -165,8 +165,7 @@ class MainVeloceViewController: UIViewController {
 		listCellModel = dataCars.map {
 			CollectionViewCellViewModel(
 				id: $0.id,
-				image: "",
-//				image: $0.image ?? UIImage(named: "Default_image") ?? UIImage(),
+				image: $0.image ?? "",
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -192,7 +191,7 @@ class MainVeloceViewController: UIViewController {
 		filterDataCars = filteredModels.map {
 			CollectionViewCellViewModel(
 				id: $0.id,
-				image: "",
+				image: $0.image ?? "",
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -294,7 +293,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
-			image: "",
+			image: fullCarModel.image ?? "",
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
 			description: fullCarModel.description ?? ""
