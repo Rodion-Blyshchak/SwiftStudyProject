@@ -10,6 +10,7 @@ import UIKit
 struct DetailViewControllerViewModel {
 	let id: Int
 	let image: String
+	let imageData: Data?
 	let title: String
 	let subTitle: String
 	let description: String

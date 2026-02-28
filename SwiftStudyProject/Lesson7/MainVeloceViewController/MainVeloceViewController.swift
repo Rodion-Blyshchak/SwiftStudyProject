@@ -166,6 +166,7 @@ class MainVeloceViewController: UIViewController {
 			CollectionViewCellViewModel(
 				id: $0.id,
 				image: $0.image ?? "",
+				imageData: $0.imageData,
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -192,6 +193,7 @@ class MainVeloceViewController: UIViewController {
 			CollectionViewCellViewModel(
 				id: $0.id,
 				image: $0.image ?? "",
+				imageData: $0.imageData,
 				title: $0.name,
 				subTitle: $0.team
 			)
@@ -294,6 +296,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
 			image: fullCarModel.image ?? "",
+			imageData: fullCarModel.imageData,
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
 			description: fullCarModel.description ?? ""
@@ -310,6 +313,14 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 }
 
 extension MainVeloceViewController: CollectionCellDelegate {
+	func didLoadImageData(id: Int, data: Data) {
+		coreDataManager.saveImageData(id: id, data: data)
+		
+		if let index = dataCars.firstIndex(where: { $0.id == id }) {
+			dataCars[index].imageData = data
+		}
+	}
+	
 	func didDeleteCellButton(with id: Int) {
 		coreDataManager.deleteCar(id: id)
 		dataCars.removeAll { $0.id == id }

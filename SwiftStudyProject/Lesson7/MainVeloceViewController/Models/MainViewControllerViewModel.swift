@@ -15,6 +15,7 @@ struct MainViewControllerViewModel {
 			CollectionViewCellViewModel(
 				id: model.id,
 				image:"",
+				imageData: model.imageData,
 				title: model.name,
 				subTitle: model.team
 			)

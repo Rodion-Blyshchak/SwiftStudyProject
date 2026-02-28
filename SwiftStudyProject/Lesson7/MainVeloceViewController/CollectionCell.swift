@@ -9,6 +9,7 @@ import UIKit
 
 protocol CollectionCellDelegate {
 	func didDeleteCellButton(with id: Int)
+	func didLoadImageData(id: Int, data: Data)
 }
 
 class CollectionCell: UICollectionViewCell {
@@ -122,9 +123,19 @@ class CollectionCell: UICollectionViewCell {
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()
 		
+		if let imageData = item.imageData, let image = UIImage(data: imageData) {
+			imageView.image = image
+			return
+		}
+		
 		imageView.image = UIImage(named: "Default_image")
 		guard let url = URL(string: item.image) else { return }
-		NetworkManager.shared.getDataImages(from: url) { [weak self] downloadedImage in
-			self?.imageView.image = downloadedImage }	
+		NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
+			self?.imageView.image = downloadedImage
+
+			if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
+				self?.delegate?.didLoadImageData(id: item.id, data: data)
+			}
+		}
 	}
 }

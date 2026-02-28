@@ -10,6 +10,7 @@ import UIKit
 struct CarModel: Codable {
 	let id: Int
 	let image: String?
+	var imageData: Data?
 	let name: String
 	let team: String
 	let description: String? = nil
@@ -21,6 +22,7 @@ struct CarModel: Codable {
 	enum CodingKeys: String, CodingKey {
 		case id
 		case image
+		case imageData
 		case name
 		case team = "teamName"
 		case maxSpeed

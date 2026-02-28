@@ -123,11 +123,10 @@ class DescriptionCellVeloceViewController: UIViewController {
 		view.addSubview(imageView)
 		
 		guard let viewModel else { return }
-		
-		imageView.image = UIImage(named: "Default_image")
-		guard let url = URL(string: viewModel.image) else { return }
-		NetworkManager.shared.getDataImages(from: url) { [weak self] downloadedImage in
-			self?.imageView.image = downloadedImage }
+
+		let imageFromDatabase = UIImage(data: viewModel.imageData ?? Data())
+		imageView.image = (imageFromDatabase != nil) ? imageFromDatabase : UIImage(named: "Default_image")
+	
 		
 		NSLayoutConstraint.activate([
 			imageView.topAnchor.constraint(equalTo: view.topAnchor),

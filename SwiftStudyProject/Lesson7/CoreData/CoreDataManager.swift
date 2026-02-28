@@ -37,6 +37,7 @@ final class CoreDataManager {
 			
 			entity.name = model.name
 			entity.image = model.image
+			entity.imageData = model.imageData
 			entity.team = model.team
 			entity.carDescription = model.description
 			entity.maxSpead = Int16(model.maxSpeed)
@@ -47,6 +48,21 @@ final class CoreDataManager {
 			appDelegate.saveContext()
 		} catch {
 			print("Failed to fetch or save car: \(error)")
+		}
+	}
+	
+	func saveImageData(id: Int, data: Data) {
+		let fetchRequest: NSFetchRequest<CarEntity> = CarEntity.fetchRequest()
+		fetchRequest.predicate = NSPredicate(format: "id == %d", id)
+		
+		do {
+			let results = try context.fetch(fetchRequest)
+			if let car = results.first {
+				car.imageData = data
+				appDelegate.saveContext()
+			}
+		} catch {
+			print("Failed to save image data: \(error)")
 		}
 	}
 	
@@ -74,6 +90,7 @@ final class CoreDataManager {
 				return CarModel(
 					id: Int(entity.id),
 					image: entity.image,
+					imageData: entity.imageData,
 					name: entity.name ?? "",
 					team: entity.team ?? "",
 //					description: entity.carDescription,
