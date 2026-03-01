@@ -149,16 +149,19 @@ class MainVeloceViewController: UIViewController {
 	//MARK: - Func loadInitialData
 	private func loadInitialData() {
 		let savedCars = coreDataManager.fetchAllCars()
-		let jsonCars = NetworkManager.shared.fetchData()
 		
-		if savedCars.isEmpty {
-			jsonCars.forEach{coreDataManager.saveCar(model: $0)}
-			dataCars = coreDataManager.fetchAllCars()
-		} else {
-			dataCars = savedCars
+		NetworkManager.shared.fetchData { [weak self] jsonCars in
+			if savedCars.isEmpty {
+				jsonCars.forEach{self?.coreDataManager.saveCar(model: $0)}
+				self?.dataCars = self?.coreDataManager.fetchAllCars() ?? []
+				self?.update()
+			}
 		}
 		
-		update()
+		if !savedCars.isEmpty {
+			dataCars = savedCars
+			update()
+		}
 	}
 	
 	private func update() {
