@@ -125,7 +125,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		guard let viewModel else { return }
 
 		let imageFromDatabase = UIImage(data: viewModel.imageData ?? Data())
-		imageView.image = (imageFromDatabase != nil) ? imageFromDatabase : UIImage(named: "Default_image")
+		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
 	
 		
 		NSLayoutConstraint.activate([

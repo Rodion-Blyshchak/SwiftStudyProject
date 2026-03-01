@@ -123,19 +123,7 @@ class CollectionCell: UICollectionViewCell {
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()
 		
-		if let imageData = item.imageData, let image = UIImage(data: imageData) {
-			imageView.image = image
-			return
-		}
-		
-		imageView.image = UIImage(named: "Default_image")
-		guard let url = URL(string: item.image) else { return }
-		NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
-			self?.imageView.image = downloadedImage
-
-			if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
-				self?.delegate?.didLoadImageData(id: item.id, data: data)
-			}
-		}
+		let imageFromDatabase = UIImage(data: item.imageData ?? Data())
+		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
 	}
 }

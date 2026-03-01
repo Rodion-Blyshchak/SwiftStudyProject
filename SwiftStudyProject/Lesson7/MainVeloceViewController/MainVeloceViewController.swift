@@ -282,6 +282,23 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
 		let itemData = filterDataCars [indexPath.item]
 		
+		if itemData.imageData == nil, let url = URL(string: itemData.image) {
+			NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
+				
+				if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
+					self?.coreDataManager.saveImageData(id: itemData.id, data: data)
+					
+					if let index = self?.dataCars.firstIndex(where: { $0.id == itemData.id }) {
+						self?.dataCars[index].imageData = data
+					}
+					
+					DispatchQueue.main.async {
+						self?.update()
+					}
+				}
+			}
+		}
+		
 		cell.configure(with: itemData)
 		cell.delegate = self
 		return cell
