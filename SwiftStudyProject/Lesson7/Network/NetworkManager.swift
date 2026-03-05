@@ -6,52 +6,70 @@
 //
 
 import UIKit
+import Combine
 
-class NetworkManager {
-	static let shared = NetworkManager()
-	private init() {}
+struct ResponseWrapper<T: Decodable>: Decodable {
+	let record: T?
+//	let metadata: Metadata?
+}
+
+//struct Metadata: Decodable {
+//	let id: String?
+//	let createdAt: String?
+//}
+
+protocol NetworkService {
+	func request<T: Decodable>(_ endpoint: Endpoint, parameters: Encodable?) -> AnyPublisher<T, APIError>
+}
+
+class NetworkManager: NetworkService {
+	private let baseURL: String
 	
-	//	https://api.jsonbin.io/v3/b/698f838cae596e708f28a522
-	
-	func fetchData(completion: @escaping ([CarModel]) -> Void) {
-		guard let url = URL(string: "https://api.jsonbin.io/v3/b/698f838cae596e708f28a522") else { return }
-		
-		URLSession.shared.dataTask(with: url) { data, response, error in
-			guard let data = data, error == nil else { return }
-			print(String(data: data, encoding: .utf8)!)
-			
-			do {
-				let resultData = try JSONDecoder().decode(CarResponseModel.self, from: data)
-				DispatchQueue.main.async {
-					completion(resultData.record)
-				}
-			} catch {
-				print(error.localizedDescription)
-				completion([])
-			}
-		}.resume()
+	init(environment: APIEnvironment = .development) {
+		self.baseURL = environment.baseURL
 	}
 	
-//	func fetchData() -> [CarModel] {
-//		guard let baseCarModelsJSON = Bundle.main.url(forResource: "baseCarModelsJSON", withExtension: "json") else { return [] }
-//		
-//		do {
-//			let data = try Data(contentsOf: baseCarModelsJSON)
-//			let resultData = try JSONDecoder().decode(CarResponseModel.self, from: data)
-////			print(String(data: data, encoding: .utf8)!)
-//			return resultData.record
-//		} catch {
-//			print(error.localizedDescription)
-//			return []
-//		}
-//	}
-	
-	func downloadImage(from url: URL, completion: @escaping (UIImage?) -> Void) {
-		URLSession.shared.dataTask(with: url) { data, response, error in
-			guard let data = data, error == nil else { return }
-			DispatchQueue.main.async {
-				completion(UIImage(data: data))
+	func request<T: Decodable>(_ endpoint: Endpoint, parameters: Encodable? = nil) -> AnyPublisher<T, APIError> {
+		guard let url = URL(string: baseURL + endpoint.path) else {
+			return Fail(error: APIError.invalidURL).eraseToAnyPublisher()
+		}
+		var urlRequest = URLRequest(url: url)
+		
+		if let parameters = parameters {
+			urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+			do {
+				let jsonData = try JSONEncoder().encode(parameters)
+				urlRequest.httpBody = jsonData
+			} catch {
+				return Fail(error: APIError.requestFailed("Encoding parameters failed.")).eraseToAnyPublisher()
 			}
-		}.resume()
+		}
+		return URLSession.shared.dataTaskPublisher(for: urlRequest)
+			.tryMap { (data, response) -> Data in
+				if let httpResponse = response as? HTTPURLResponse,
+				   (200..<300).contains(httpResponse.statusCode) {
+					return data
+				} else {
+					let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+					throw APIError.requestFailed("Request failed with status code: \(statusCode)")
+				}
+			}
+			.decode(type: ResponseWrapper<T>.self, decoder: JSONDecoder())
+			.tryMap { wrapper in
+				guard let resultData = wrapper.record else {
+					throw APIError.requestFailed("Missing status.")
+				}
+				return resultData
+			}
+			.mapError { error -> APIError in
+				if error is DecodingError {
+					return APIError.decodingFailed
+				} else if let apiError = error as? APIError {
+					return apiError
+				} else {
+					return APIError.requestFailed("An unknown error occurred.")
+				}
+			}
+			.eraseToAnyPublisher()
 	}
 }
