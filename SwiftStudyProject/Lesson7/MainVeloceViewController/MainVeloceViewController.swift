@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import Combine
 
 class MainVeloceViewController: UIViewController {
 	enum ConstantsSize {
@@ -34,6 +34,10 @@ class MainVeloceViewController: UIViewController {
 //	private let storageManager = CarStorageManager()
 	private let coreDataManager = CoreDataManager.shared
 	private lazy var isFavoriteFilterActive = false
+	
+	// Network
+	private let networkService: NetworkService = NetworkManager()
+	private var cancellables: Set<AnyCancellable> = []
 	
 	private lazy var Label: UILabel = {
 		let title = UILabel()
@@ -150,11 +154,12 @@ class MainVeloceViewController: UIViewController {
 	private func loadInitialData() {
 		let savedCars = coreDataManager.fetchAllCars()
 		
-		NetworkManager.shared.fetchData { [weak self] jsonCars in
-			if savedCars.isEmpty {
-				jsonCars.forEach{self?.coreDataManager.saveCar(model: $0)}
-				self?.dataCars = self?.coreDataManager.fetchAllCars() ?? []
-				self?.update()
+		if savedCars.isEmpty {
+			receivingDataFromNetwork {jsonCars in
+				if jsonCars {
+					self.dataCars.forEach { self.coreDataManager.saveCar(model: $0) }
+					self.update()
+				}
 			}
 		}
 		
@@ -176,6 +181,26 @@ class MainVeloceViewController: UIViewController {
 		}
 		filterDataCars = listCellModel
 		layoutView.reloadData()
+	}
+	
+	//MARK: - receivingDataFromNetwork Отримуємо дані
+	func receivingDataFromNetwork(onCompletion: @escaping (Bool) -> ())  {
+		let response: AnyPublisher<[CarModel], APIError> = networkService.request(.getCars, parameters: nil)
+		response
+			.receive(on: DispatchQueue.main)
+			.sink { completion in
+				switch completion {
+					case .finished:
+						break
+					case .failure(let error):
+						print("Error: \(error)")
+						onCompletion(false)
+				}
+			} receiveValue: { downloadedCars in
+				self.dataCars = downloadedCars
+				onCompletion(true)
+		}
+			.store(in: &cancellables)
 	}
 	
 	//MARK: - FavoriteFFilters
@@ -285,22 +310,22 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
 		let itemData = filterDataCars [indexPath.item]
 		
-		if itemData.imageData == nil, let url = URL(string: itemData.image) {
-			NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
-				
-				if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
-					self?.coreDataManager.saveImageData(id: itemData.id, data: data)
-					
-					if let index = self?.dataCars.firstIndex(where: { $0.id == itemData.id }) {
-						self?.dataCars[index].imageData = data
-					}
-					
-					DispatchQueue.main.async {
-						self?.update()
-					}
-				}
-			}
-		}
+//		if itemData.imageData == nil, let url = URL(string: itemData.image) {
+//			NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
+//				
+//				if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
+//					self?.coreDataManager.saveImageData(id: itemData.id, data: data)
+//					
+//					if let index = self?.dataCars.firstIndex(where: { $0.id == itemData.id }) {
+//						self?.dataCars[index].imageData = data
+//					}
+//					
+//					DispatchQueue.main.async {
+//						self?.update()
+//					}
+//				}
+//			}
+//		}
 		
 		cell.configure(with: itemData)
 		cell.delegate = self

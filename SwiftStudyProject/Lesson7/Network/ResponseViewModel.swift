@@ -10,7 +10,7 @@ import Combine
 
 class ResponseViewModel: ObservableObject {
 
-	@Published var cars: [CarModel] = []
+	var cars: [CarModel] = []
 	private let networkService: NetworkService
 	private var cancellables: Set<AnyCancellable> = []
 
