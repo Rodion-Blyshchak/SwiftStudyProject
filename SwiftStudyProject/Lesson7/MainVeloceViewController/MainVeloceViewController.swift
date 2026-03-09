@@ -20,6 +20,10 @@ class MainVeloceViewController: UIViewController {
 		static let spacing: CGFloat = 4
 	}
 	
+	enum CarsError: Error {
+		case failedToDownload(reason: String)
+	}
+	
 	//MARK: - Properties
 	private lazy var dataCars: [CarModel] = []
 	
@@ -156,14 +160,17 @@ class MainVeloceViewController: UIViewController {
 		
 		if savedCars.isEmpty {
 			receivingDataFromNetwork {jsonCars in
-				if jsonCars {
+				switch jsonCars {
+				case .success(let cars):
+					self.dataCars = cars
 					self.dataCars.forEach { self.coreDataManager.saveCar(model: $0) }
 					self.update()
+				case .failure(let error):
+					print(error.localizedDescription)
 				}
+				
 			}
-		}
-		
-		if !savedCars.isEmpty {
+		} else {
 			dataCars = savedCars
 			update()
 		}
@@ -184,7 +191,7 @@ class MainVeloceViewController: UIViewController {
 	}
 	
 	//MARK: - receivingDataFromNetwork Отримуємо дані
-	func receivingDataFromNetwork(onCompletion: @escaping (Bool) -> ())  {
+	func receivingDataFromNetwork(onCompletion: @escaping (Result<[CarModel], CarsError>) -> Void)  {
 		let response: AnyPublisher<[CarModel], APIError> = networkService.request(.getCars, parameters: nil)
 		response
 			.receive(on: DispatchQueue.main)
@@ -193,14 +200,11 @@ class MainVeloceViewController: UIViewController {
 					case .finished:
 						break
 					case .failure(let error):
-						print("Error: \(error)")
-						onCompletion(false)
+					onCompletion(.failure(.failedToDownload(reason: error.localizedDescription)))
 				}
 			} receiveValue: { downloadedCars in
-				self.dataCars = downloadedCars
-				onCompletion(true)
-		}
-			.store(in: &cancellables)
+				onCompletion(.success(downloadedCars))
+		}.store(in: &cancellables)
 	}
 	
 	//MARK: - FavoriteFFilters
@@ -310,25 +314,30 @@ extension MainVeloceViewController: UICollectionViewDataSource {
 		guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CollectionCell.reuseId, for: indexPath) as? CollectionCell else { return UICollectionViewCell() }
 		let itemData = filterDataCars [indexPath.item]
 		
-//		if itemData.imageData == nil, let url = URL(string: itemData.image) {
-//			NetworkManager.shared.downloadImage(from: url) { [weak self] downloadedImage in
-//				
-//				if let data = downloadedImage?.jpegData(compressionQuality: 0.8) {
-//					self?.coreDataManager.saveImageData(id: itemData.id, data: data)
-//					
-//					if let index = self?.dataCars.firstIndex(where: { $0.id == itemData.id }) {
-//						self?.dataCars[index].imageData = data
-//					}
-//					
-//					DispatchQueue.main.async {
-//						self?.update()
-//					}
-//				}
-//			}
-//		}
 		
 		cell.configure(with: itemData)
 		cell.delegate = self
+		
+		if itemData.imageData == nil, let imageUrl = URL(string: itemData.image) {
+			cell.loadImage(from: imageUrl) { data in
+				guard let data else { return }
+				
+				self.coreDataManager.saveImageData(id: itemData.id, data: data)
+				
+				if let index = self.dataCars.firstIndex(where: { $0.id == itemData.id }) {
+					self.dataCars[index].imageData = data
+					
+					if let filterIndex = self.filterDataCars.firstIndex(where: { $0.id == itemData.id }) {
+						self.filterDataCars[filterIndex].imageData = data
+					}
+				}
+				
+				DispatchQueue.main.async {
+					self.update()
+				}
+			}
+		}
+		
 		return cell
 	}
 }

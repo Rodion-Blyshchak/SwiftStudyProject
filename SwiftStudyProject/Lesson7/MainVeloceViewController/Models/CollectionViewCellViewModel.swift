@@ -10,7 +10,7 @@ import UIKit
 struct CollectionViewCellViewModel {
 	let id: Int
 	let image: String
-	let imageData: Data?
+	var imageData: Data?
 	let title: String
 	let subTitle: String
 }

@@ -75,6 +75,7 @@ final class CoreDataManager {
 			if let carDelete = results.first {
 				context.delete(carDelete)
 			}
+			try context.save()
 		} catch {
 			print("Failed to delete car: \(error)")
 		}

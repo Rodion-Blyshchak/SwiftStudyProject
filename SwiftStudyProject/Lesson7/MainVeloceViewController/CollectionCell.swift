@@ -28,6 +28,7 @@ class CollectionCell: UICollectionViewCell {
 	var delegate: CollectionCellDelegate?
 	var itemID: Int?
 	
+	
 	private let imageView: UIImageView = {
 		let imageView = UIImageView()
 		imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -125,5 +126,18 @@ class CollectionCell: UICollectionViewCell {
 		
 		let imageFromDatabase = UIImage(data: item.imageData ?? Data())
 		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
+	}
+	
+	func loadImage(from url: URL, completion: @escaping (Data?) -> Void) {
+		imageView.image(fromURL: url) { error in
+			guard error == nil,
+				  let image = self.imageView.image,
+				  let data = image.jpegData(compressionQuality: 0.8) else {
+				completion(nil)
+				return
+			}
+			
+			completion(data)
+		}
 	}
 }

@@ -13,7 +13,7 @@ enum Endpoint {
 	var path: String {
 		switch self {
 		case .getCars:
-			return "/v3/b/698f838cae596e708f28a522"
+			return "/v3/b/69a49813d0ea881f40e5601f"
 		}
 	}
 	
