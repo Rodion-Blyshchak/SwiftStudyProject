@@ -8,8 +8,9 @@
 import UIKit
 
 struct CollectionViewCellViewModel {
-	let id: String
-	let image: UIImage
+	let id: Int
+	let image: String
+	var imageData: Data?
 	let title: String
 	let subTitle: String
 }

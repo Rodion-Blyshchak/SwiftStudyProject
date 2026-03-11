@@ -8,7 +8,8 @@
 import UIKit
 
 protocol CollectionCellDelegate {
-	func didDeleteCellButton(with id: String)
+	func didDeleteCellButton(with id: Int)
+	func didLoadImageData(id: Int, data: Data)
 }
 
 class CollectionCell: UICollectionViewCell {
@@ -25,7 +26,8 @@ class CollectionCell: UICollectionViewCell {
 	static let reuseId = "CollectionCell"
 	
 	var delegate: CollectionCellDelegate?
-	var itemID: String?
+	var itemID: Int?
+	
 	
 	private let imageView: UIImageView = {
 		let imageView = UIImageView()
@@ -119,8 +121,23 @@ class CollectionCell: UICollectionViewCell {
 	
 	func configure(with item: CollectionViewCellViewModel) {
 		itemID = item.id
-		imageView.image = item.image
 		titleLabel.text = item.title
 		subtitleLabel.text = item.subTitle.uppercased()
+		
+		let imageFromDatabase = UIImage(data: item.imageData ?? Data())
+		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
+	}
+	
+	func loadImage(from url: URL, completion: @escaping (Data?) -> Void) {
+		imageView.image(fromURL: url) { error in
+			guard error == nil,
+				  let image = self.imageView.image,
+				  let data = image.jpegData(compressionQuality: 0.8) else {
+				completion(nil)
+				return
+			}
+			
+			completion(data)
+		}
 	}
 }

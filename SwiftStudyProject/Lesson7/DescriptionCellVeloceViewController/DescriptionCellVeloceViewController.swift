@@ -8,7 +8,7 @@
 import UIKit
 
 protocol DescriptionCellVeloceViewControllerDelegate {
-	func didTapFavoriteAction(id: String)
+	func didTapFavoriteAction(id: Int)
 }
 
 class DescriptionCellVeloceViewController: UIViewController {
@@ -26,7 +26,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	//MARK: - Properties
 	var viewModel: DetailViewControllerViewModel?
 	var delegate: DescriptionCellVeloceViewControllerDelegate?
-	var itemID: String?
+	var itemID: Int?
 	
 	private let imageView: UIImageView = {
 		let image = UIImageView()
@@ -120,11 +120,13 @@ class DescriptionCellVeloceViewController: UIViewController {
 	
 	//MARK: - Setup
 	private func setupTopContent() {
-		guard let viewModel else { return }
-		
-		imageView.image = viewModel.image
-		
 		view.addSubview(imageView)
+		
+		guard let viewModel else { return }
+
+		let imageFromDatabase = UIImage(data: viewModel.imageData ?? Data())
+		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
+	
 		
 		NSLayoutConstraint.activate([
 			imageView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -134,14 +136,14 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	private func setupTitle() {
-		guard let viewModel else { return } // повторюється!
-		
-		nameCarLabel.text = viewModel.title
-		teamCarLabel.text = viewModel.subTitle.uppercased()
 		mainInfoStackView.addArrangedSubview(nameCarLabel)
 		mainInfoStackView.addArrangedSubview(teamCarLabel)
 		view.addSubview(mainInfoStackView)
 		
+		guard let viewModel else { return } // повторюється!
+		nameCarLabel.text = viewModel.title
+		teamCarLabel.text = viewModel.subTitle.uppercased()
+	
 		NSLayoutConstraint.activate([
 			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
 			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
@@ -150,10 +152,10 @@ class DescriptionCellVeloceViewController: UIViewController {
 	}
 	
 	private func setupdescription() {
-		guard let viewModel else { return }
-		
-		carDescriptionLabel.text = viewModel.description
 		view.addSubview(carDescriptionLabel)
+		
+		guard let viewModel else { return }
+		carDescriptionLabel.text = viewModel.description
 		
 		NSLayoutConstraint.activate([
 			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),

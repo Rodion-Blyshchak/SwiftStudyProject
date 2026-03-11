@@ -176,14 +176,17 @@ class AddCarViewController: UIViewController {
 	
 	//MARK: - Func didAddTapNewCard
 	@objc private func didAddTapNewCard() {
-		let description = (descriptionTextField.textColor == .lightGray) ? "" : (descriptionTextField.text ?? "")
+//		let description = (descriptionTextField.textColor == .lightGray) ? "" : (descriptionTextField.text ?? "")
+		let imageToSave = imageView.image
+		let imageData = imageToSave?.jpegData(compressionQuality: 0.8)
 		
 		let newCardModel = CarModel(
-			id: UUID().uuidString,
-			image: imageView.image ?? UIImage(named: "Default_image"),
+			id: Int(Date().timeIntervalSince1970),
+			image: "",
+			imageData: imageData,
 			name: modelTextField.text ?? "",
 			team: brandTextField.text ?? "",
-			description: description,
+//			description: description,
 			maxSpeed: 0,
 			acceleration: Float(accelerationTextField.text ?? "") ?? 0.0,
 			weight: Int(weightTextField.text ?? "") ?? 0

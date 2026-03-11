@@ -25,8 +25,9 @@ extension CarEntity {
 
     @NSManaged public var acceleration: Float
     @NSManaged public var carDescription: String?
-    @NSManaged public var id: String?
-    @NSManaged public var image: Data?
+	@NSManaged public var id: Int64
+    @NSManaged public var image: String?
+	@NSManaged public var imageData: Data?
     @NSManaged public var maxSpead: Int16
     @NSManaged public var name: String?
     @NSManaged public var team: String?
