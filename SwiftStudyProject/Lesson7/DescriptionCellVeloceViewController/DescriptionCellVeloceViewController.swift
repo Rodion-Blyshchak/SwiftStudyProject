@@ -66,7 +66,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 	private let carDescriptionLabel: UILabel = {
 		let descriptionLabel = UILabel()
 		descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
-		descriptionLabel.textColor = .appGreyDark
+		descriptionLabel.textColor = .appBlack
 		descriptionLabel.font = .systemFont(ofSize: ConstantsSize.font, weight: .light)
 		descriptionLabel.numberOfLines = 0
 		return descriptionLabel
@@ -103,7 +103,7 @@ class DescriptionCellVeloceViewController: UIViewController {
 		
 		setupTopContent()
 		setupTitle()
-		setupdescription()
+		setupDescription()
 		setupFavoriteButton()
 		
 		updateFavoriteButtonState(isFavorite: favoriteStatus)
@@ -145,20 +145,20 @@ class DescriptionCellVeloceViewController: UIViewController {
 		teamCarLabel.text = viewModel.subTitle.uppercased()
 	
 		NSLayoutConstraint.activate([
-			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20),
+			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: ConstantsSize.mainIndent),
 			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			mainInfoStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
-	private func setupdescription() {
+	private func setupDescription() {
 		view.addSubview(carDescriptionLabel)
 		
 		guard let viewModel else { return }
 		carDescriptionLabel.text = viewModel.description
 		
 		NSLayoutConstraint.activate([
-			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: 24),
+			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: ConstantsSize.mainIndent),
 			carDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			carDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])

@@ -347,13 +347,20 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		let selectedItem = filterDataCars [indexPath.item]
 		guard let fullCarModel = dataCars.first(where: { $0.id == selectedItem.id }) else { return }
 		
+		let fullDescriptionText = """
+		Технічні характеристики \(fullCarModel.name):
+		 • Розгін:  \(fullCarModel.acceleration) с
+		 • Вага:  \(fullCarModel.weight) кг
+		 • Макс. швидкість:  \(fullCarModel.maxSpeed) км/год
+		"""
+		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
 			image: fullCarModel.image ?? "",
 			imageData: fullCarModel.imageData,
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
-			description: fullCarModel.description ?? ""
+			description: fullDescriptionText
 		)
 
 		let descriptionViewController = DescriptionCellVeloceViewController()
