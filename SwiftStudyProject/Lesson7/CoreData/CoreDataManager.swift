@@ -44,6 +44,8 @@ final class CoreDataManager {
 			entity.acceleration = model.acceleration
 			entity.weight = Int16(model.weight)
 			entity.isInFavorite = model.isInFavorite
+			entity.latitude = model.location?.latitude ?? 0
+			entity.longitude = model.location?.longitude ?? 0
 			
 			appDelegate.saveContext()
 		} catch {
@@ -98,7 +100,8 @@ final class CoreDataManager {
 					maxSpeed: Int(entity.maxSpead),
 					acceleration: entity.acceleration,
 					weight: Int(entity.weight),
-					isInFavorite: entity.isInFavorite
+					isInFavorite: entity.isInFavorite,
+					location: Location(latitude: entity.latitude, longitude: entity.longitude)
 				)
 			}
 		} catch {

@@ -18,6 +18,7 @@ struct CarModel: Codable {
 	let acceleration: Float
 	let weight: Int
 	var isInFavorite: Bool = false
+	let location: Location?
 	
 	enum CodingKeys: String, CodingKey {
 		case id
@@ -28,9 +29,15 @@ struct CarModel: Codable {
 		case maxSpeed
 		case acceleration
 		case weight
+		case location
 	}
 }
 
+
+struct Location: Codable {
+	var latitude: Double
+	var longitude: Double
+}
 
 
 /*

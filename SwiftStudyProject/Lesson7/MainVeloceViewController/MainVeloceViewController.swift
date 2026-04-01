@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import MapKit
 
 class MainVeloceViewController: UIViewController {
 	enum ConstantsSize {
@@ -351,7 +352,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		Технічні характеристики \(fullCarModel.name):
 		 • Розгін:  \(fullCarModel.acceleration) с
 		 • Вага:  \(fullCarModel.weight) кг
-		 • Макс. швидкість:  \(fullCarModel.maxSpeed) км/год
+		 • Макс. швидкість:  \(fullCarModel.maxSpeed) км/год 
 		"""
 		
 		let detailModel = DetailViewControllerViewModel(
@@ -360,7 +361,8 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 			imageData: fullCarModel.imageData,
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
-			description: fullDescriptionText
+			description: fullDescriptionText,
+			location: fullCarModel.location
 		)
 
 		let descriptionViewController = DescriptionCellVeloceViewController()
@@ -368,6 +370,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		descriptionViewController.itemID = detailModel.id
 		descriptionViewController.favoriteStatus = fullCarModel.isInFavorite
 		descriptionViewController.delegate = self
+		descriptionViewController.hidesBottomBarWhenPushed = true
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
 	}

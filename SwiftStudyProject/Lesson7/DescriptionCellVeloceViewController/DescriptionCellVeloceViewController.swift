@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MapKit
 
 protocol DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: Int)
@@ -16,8 +17,8 @@ class DescriptionCellVeloceViewController: UIViewController {
 		static let imageHeightAnchor: CGFloat = 300
 		static let buttonHeightAnchor: CGFloat = 50
 		static let buttonWidthAnchor: CGFloat = 50
-		static let mainIndent: CGFloat = 16
-		static let negativeMainIndent: CGFloat = -16
+		static let mainIndent: CGFloat = 14
+		static let negativeMainIndent: CGFloat = -14
 		static let font: CGFloat = 20
 		static let fontNameCar: CGFloat = 48
 		static let cornerRadius: CGFloat = 20
@@ -72,6 +73,23 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return descriptionLabel
 	}()
 	
+	private let locationLabel: UILabel = {
+		let location = UILabel()
+		location.translatesAutoresizingMaskIntoConstraints = false
+		location.textColor = .appBlack
+		location.font = .systemFont(ofSize: ConstantsSize.font, weight: .bold)
+		return location
+	}()
+	
+	private let geocoder = CLGeocoder()
+	
+	private	lazy var mapView: MKMapView = {
+		let map = MKMapView()
+		map.translatesAutoresizingMaskIntoConstraints = false
+		map.layer.cornerRadius = ConstantsSize.cornerRadius
+		return map
+	}()
+	
 	lazy var favoriteStatus: Bool = false
 	
 	private let favoriteButton: UIButton = {
@@ -104,7 +122,11 @@ class DescriptionCellVeloceViewController: UIViewController {
 		setupTopContent()
 		setupTitle()
 		setupDescription()
+		setupLocation()
+		setupMapView()
 		setupFavoriteButton()
+		
+		displayCarOnMap()
 		
 		updateFavoriteButtonState(isFavorite: favoriteStatus)
 	}
@@ -116,6 +138,35 @@ class DescriptionCellVeloceViewController: UIViewController {
 		let title = isFavorite ? "Remove from Favorites" : "Add to Favorites"
 		favoriteButton.setTitle(title, for: .normal)
 		favoriteButton.backgroundColor = isFavorite ? .appGreyDark : .appBlack
+	}
+	
+	//MARK: - Map
+	private func displayCarOnMap() {
+		guard let location = viewModel?.location else { return }
+		
+		let annotation = MKPointAnnotation()
+		annotation.coordinate = CLLocationCoordinate2D(
+			latitude: location.latitude,
+			longitude: location.longitude
+		)
+		
+		mapView.addAnnotation(annotation)
+		mapView.showAnnotations([annotation], animated: true)
+	}
+	
+	private func fetchCityName() -> String{
+		let location = CLLocation(latitude: viewModel?.location?.latitude ?? 0, longitude: viewModel?.location?.longitude ?? 0)
+		var address = ""
+		
+		geocoder.reverseGeocodeLocation(location) { placemarks, error in
+			guard error == nil else { return }
+			
+			if let placemark = placemarks?.first {
+				address =  " \(placemark.name ?? ""), \(placemark.locality ?? "")"
+			}
+		}
+		
+		return address
 	}
 	
 	//MARK: - Setup
@@ -161,6 +212,28 @@ class DescriptionCellVeloceViewController: UIViewController {
 			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: ConstantsSize.mainIndent),
 			carDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			carDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
+		])
+	}
+	
+	private func setupLocation() {
+		locationLabel.text = "Location: \(fetchCityName())"
+		view.addSubview(locationLabel)
+		
+		NSLayoutConstraint.activate([
+			locationLabel.topAnchor.constraint(equalTo: carDescriptionLabel.bottomAnchor, constant: ConstantsSize.mainIndent),
+			locationLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			locationLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+		])
+	}
+	
+	private func setupMapView() {
+		view.addSubview(mapView)
+		
+		NSLayoutConstraint.activate([
+			mapView.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: ConstantsSize.mainIndent),
+			mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
+			mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			mapView.heightAnchor.constraint(equalTo: mapView.widthAnchor, multiplier: 0.6)
 		])
 	}
 	

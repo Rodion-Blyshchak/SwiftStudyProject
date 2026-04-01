@@ -14,5 +14,5 @@ struct DetailViewControllerViewModel {
 	let title: String
 	let subTitle: String
 	let description: String
-	// ...
+	let location: Location?
 }
