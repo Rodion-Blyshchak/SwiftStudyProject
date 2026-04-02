@@ -40,7 +40,7 @@ class MapKitViewController: UIViewController {
 	private func displayCarsOnMap() {
 		var annotations: [MKPointAnnotation] = []
 		
-		for location in mockDataCars {
+		mockDataCars.forEach{ location in
 			let annotation = MKPointAnnotation()
 			annotation.title = location.name
 			annotation.subtitle  = location.team

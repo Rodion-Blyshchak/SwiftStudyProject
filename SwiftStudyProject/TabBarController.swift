@@ -27,7 +27,7 @@ class TabBarController: UITabBarController {
 			rootViewController: MapKitViewController(),
 			title: "Map",
 			image: .init(systemName: "map.fill"),
-			tag: 2,
+			tag: 1,
 			navigationControllerRequired: false
 		)
 		
