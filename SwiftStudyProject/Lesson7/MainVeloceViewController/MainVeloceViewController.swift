@@ -121,7 +121,7 @@ class MainVeloceViewController: UIViewController {
 		tapOutsideKeyboard.cancelsTouchesInView = false
 		view.addGestureRecognizer(tapOutsideKeyboard)
 		
-		navigationController?.setNavigationBarHidden(true, animated: false)
+//		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
 //		storageManager.delegate = self
@@ -130,6 +130,12 @@ class MainVeloceViewController: UIViewController {
 		setupHeaderView()
 		setupSearchView()
 		setupCollectionView()
+	}
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		navigationController?.setNavigationBarHidden(true, animated: animated)
 	}
 
 	
@@ -278,13 +284,11 @@ class MainVeloceViewController: UIViewController {
 	
 	private func setupSearchView() {
 		searchView.delegate = self
-		notificationManager.delegate = self
+//		notificationManager.delegate = self
 		view.addSubview(searchView)
 		
-		searchViewBottomConstraint = searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-		
 		NSLayoutConstraint.activate([
-			searchViewBottomConstraint!,
+			searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 			searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
@@ -420,15 +424,15 @@ extension MainVeloceViewController: AddCarViewDelegate {
 	}
 }
 
-extension MainVeloceViewController: NotificationManagerDelegate {
-	func keyboardToggle(height: CGFloat, isOn: Bool) {
-		searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
-		
-		UIView.animate(withDuration: 0.3) {
-			self.view.layoutIfNeeded()
-		}
-	}
-}
+//extension MainVeloceViewController: NotificationManagerDelegate {
+//	func keyboardToggle(height: CGFloat, isOn: Bool) {
+//		searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
+//		
+//		UIView.animate(withDuration: 0.3) {
+//			self.view.layoutIfNeeded()
+//		}
+//	}
+//}
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: Int) {

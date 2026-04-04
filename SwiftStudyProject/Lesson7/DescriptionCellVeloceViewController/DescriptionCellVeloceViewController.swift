@@ -38,6 +38,20 @@ class DescriptionCellVeloceViewController: UIViewController {
 		return image
 	}()
 	
+	private let scrollView: UIScrollView = {
+		let scroll = UIScrollView()
+		scroll.translatesAutoresizingMaskIntoConstraints = false
+		scroll.alwaysBounceVertical = true
+		scroll.showsVerticalScrollIndicator = false
+		return scroll
+	}()
+	
+	private let contentView: UIView = {
+		let content = UIView()
+		content.translatesAutoresizingMaskIntoConstraints = false
+		return content
+	}()
+	
 	private let nameCarLabel: UILabel = {
 		let nameLable = UILabel()
 		nameLable.translatesAutoresizingMaskIntoConstraints = false
@@ -78,6 +92,8 @@ class DescriptionCellVeloceViewController: UIViewController {
 		location.translatesAutoresizingMaskIntoConstraints = false
 		location.textColor = .appBlack
 		location.font = .systemFont(ofSize: ConstantsSize.font, weight: .bold)
+		location.text = "Searching location..."
+		location.numberOfLines = 2
 		return location
 	}()
 	
@@ -103,31 +119,33 @@ class DescriptionCellVeloceViewController: UIViewController {
 		button.addTarget(self, action: #selector(didTapFavorite), for: .touchUpInside)
 		return button
 	}()
-
+	
 	//MARK: - Lifecycle
 	override func viewWillAppear(_ animated: Bool) {
 		super.viewWillAppear(animated)
 		navigationController?.setNavigationBarHidden(false, animated: animated)
 	}
-
+	
 	override func viewWillDisappear(_ animated: Bool) {
 		super.viewWillDisappear(animated)
 		navigationController?.setNavigationBarHidden(true, animated: animated)
+		
+		UIView.animate(withDuration: 0.3) {
+			self.tabBarController?.tabBar.alpha = 0
+		}
 	}
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		view.backgroundColor = .appWhite
 		
-		setupTopContent()
-		setupTitle()
-		setupDescription()
-		setupLocation()
-		setupMapView()
+		setupImageView()
 		setupFavoriteButton()
+		setupScrollView()
+		setupContentView()
 		
 		displayCarOnMap()
-		
+		fetchCityName()
 		updateFavoriteButtonState(isFavorite: favoriteStatus)
 	}
 	
@@ -154,30 +172,30 @@ class DescriptionCellVeloceViewController: UIViewController {
 		mapView.showAnnotations([annotation], animated: true)
 	}
 	
-	private func fetchCityName() -> String{
+	private func fetchCityName() {
 		let location = CLLocation(latitude: viewModel?.location?.latitude ?? 0, longitude: viewModel?.location?.longitude ?? 0)
-		var address = ""
 		
-		geocoder.reverseGeocodeLocation(location) { placemarks, error in
-			guard error == nil else { return }
-			
-			if let placemark = placemarks?.first {
-				address =  " \(placemark.name ?? ""), \(placemark.locality ?? "")"
+		location.geocode { placemark, error in
+			if let error = error as? CLError {
+				print("CLError:", error)
+				return
+			} else if let placemark = placemark?.first {
+				DispatchQueue.main.async {
+					self.locationLabel.text = "Location: \(placemark.locality ?? ""), \(placemark.administrativeArea ?? "")"
+				}
 			}
 		}
-		
-		return address
 	}
 	
 	//MARK: - Setup
-	private func setupTopContent() {
+	private func setupImageView() {
 		view.addSubview(imageView)
 		
 		guard let viewModel else { return }
-
+		
 		let imageFromDatabase = UIImage(data: viewModel.imageData ?? Data())
 		imageView.image = imageFromDatabase ?? UIImage(named: "Default_image")
-	
+		
 		
 		NSLayoutConstraint.activate([
 			imageView.topAnchor.constraint(equalTo: view.topAnchor),
@@ -186,56 +204,61 @@ class DescriptionCellVeloceViewController: UIViewController {
 		])
 	}
 	
-	private func setupTitle() {
+	private func setupScrollView() {
+		view.addSubview(scrollView)
+		scrollView.addSubview(contentView)
+		
+		NSLayoutConstraint.activate([
+			scrollView.topAnchor.constraint(equalTo: imageView.bottomAnchor),
+			scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+			scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+			scrollView.bottomAnchor.constraint(equalTo: favoriteButton.topAnchor, constant: ConstantsSize.negativeMainIndent),
+		])
+	}
+	
+	private func setupContentView() {
+		contentView.addSubview(mainInfoStackView)
+		contentView.addSubview(carDescriptionLabel)
+		contentView.addSubview(locationLabel)
+		contentView.addSubview(mapView)
+		
 		mainInfoStackView.addArrangedSubview(nameCarLabel)
 		mainInfoStackView.addArrangedSubview(teamCarLabel)
-		view.addSubview(mainInfoStackView)
-		
-		guard let viewModel else { return } // повторюється!
-		nameCarLabel.text = viewModel.title
-		teamCarLabel.text = viewModel.subTitle.uppercased()
-	
-		NSLayoutConstraint.activate([
-			mainInfoStackView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: ConstantsSize.mainIndent),
-			mainInfoStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			mainInfoStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
-		])
-	}
-	
-	private func setupDescription() {
-		view.addSubview(carDescriptionLabel)
 		
 		guard let viewModel else { return }
+		nameCarLabel.text = viewModel.title
+		teamCarLabel.text = viewModel.subTitle.uppercased()
+		
 		carDescriptionLabel.text = viewModel.description
 		
+		
 		NSLayoutConstraint.activate([
+			contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+			contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+			contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+			contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+			contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+			
+			mainInfoStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: ConstantsSize.mainIndent),
+			mainInfoStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: ConstantsSize.mainIndent),
+			mainInfoStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			
 			carDescriptionLabel.topAnchor.constraint(equalTo: mainInfoStackView.bottomAnchor, constant: ConstantsSize.mainIndent),
-			carDescriptionLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			carDescriptionLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
-		])
-	}
-	
-	private func setupLocation() {
-		locationLabel.text = "Location: \(fetchCityName())"
-		view.addSubview(locationLabel)
-		
-		NSLayoutConstraint.activate([
+			carDescriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: ConstantsSize.mainIndent),
+			carDescriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			
 			locationLabel.topAnchor.constraint(equalTo: carDescriptionLabel.bottomAnchor, constant: ConstantsSize.mainIndent),
-			locationLabel.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			locationLabel.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			locationLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: ConstantsSize.mainIndent),
+			locationLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			
+			mapView.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: ConstantsSize.mainIndent),
+			mapView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: ConstantsSize.mainIndent),
+			mapView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
+			mapView.heightAnchor.constraint(equalTo: mapView.widthAnchor, multiplier: 0.6),
+			mapView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
 	}
 	
-	private func setupMapView() {
-		view.addSubview(mapView)
-		
-		NSLayoutConstraint.activate([
-			mapView.topAnchor.constraint(equalTo: locationLabel.bottomAnchor, constant: ConstantsSize.mainIndent),
-			mapView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
-			mapView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent),
-			mapView.heightAnchor.constraint(equalTo: mapView.widthAnchor, multiplier: 0.6)
-		])
-	}
 	
 	private func setupFavoriteButton() {
 		view.addSubview(favoriteButton)
@@ -254,5 +277,11 @@ class DescriptionCellVeloceViewController: UIViewController {
 	
 	func updateFavoriteStatus(isFavorite: Bool) {
 		updateFavoriteButtonState(isFavorite: isFavorite)
+	}
+}
+
+extension CLLocation {
+	func geocode(completion: @escaping (_ placemark: [CLPlacemark]?, _ error: Error?) -> Void) {
+		CLGeocoder().reverseGeocodeLocation(self, completionHandler: completion)
 	}
 }
