@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 
 class MapKitViewController: UIViewController {
-	private let mockDataCars = CoreDataManager.shared.fetchAllCars()
+	private var mockDataCars = CoreDataManager.shared.fetchAllCars()
 	
 	private let mapView: MKMapView = {
 		let map = MKMapView()
@@ -26,6 +26,13 @@ class MapKitViewController: UIViewController {
 		displayCarsOnMap()
 	}
 	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		self.mockDataCars = CoreDataManager.shared.fetchAllCars()
+		displayCarsOnMap()
+	}
+	
 	private func setupMapView() {
 		view.addSubview(mapView)
 		
@@ -38,6 +45,8 @@ class MapKitViewController: UIViewController {
 	}
 	
 	private func displayCarsOnMap() {
+		mapView.removeAnnotations(mapView.annotations)
+		
 		var annotations: [MKPointAnnotation] = []
 		
 		mockDataCars.forEach{ location in
