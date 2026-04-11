@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import MapKit
 
 class MainVeloceViewController: UIViewController {
 	enum ConstantsSize {
@@ -120,7 +121,7 @@ class MainVeloceViewController: UIViewController {
 		tapOutsideKeyboard.cancelsTouchesInView = false
 		view.addGestureRecognizer(tapOutsideKeyboard)
 		
-		navigationController?.setNavigationBarHidden(true, animated: false)
+//		navigationController?.setNavigationBarHidden(true, animated: false)
 		filterDataCars = listCellModel
 		
 //		storageManager.delegate = self
@@ -129,6 +130,12 @@ class MainVeloceViewController: UIViewController {
 		setupHeaderView()
 		setupSearchView()
 		setupCollectionView()
+	}
+	
+	override func viewWillAppear(_ animated: Bool) {
+		super.viewWillAppear(animated)
+		
+		navigationController?.setNavigationBarHidden(true, animated: animated)
 	}
 
 	
@@ -277,13 +284,11 @@ class MainVeloceViewController: UIViewController {
 	
 	private func setupSearchView() {
 		searchView.delegate = self
-		notificationManager.delegate = self
+//		notificationManager.delegate = self
 		view.addSubview(searchView)
 		
-		searchViewBottomConstraint = searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
-		
 		NSLayoutConstraint.activate([
-			searchViewBottomConstraint!,
+			searchView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
 			searchView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: ConstantsSize.mainIndent),
 			searchView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: ConstantsSize.negativeMainIndent)
 		])
@@ -347,13 +352,21 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		let selectedItem = filterDataCars [indexPath.item]
 		guard let fullCarModel = dataCars.first(where: { $0.id == selectedItem.id }) else { return }
 		
+		let fullDescriptionText = """
+		Технічні характеристики \(fullCarModel.name):
+		 • Розгін:  \(fullCarModel.acceleration) с
+		 • Вага:  \(fullCarModel.weight) кг
+		 • Макс. швидкість:  \(fullCarModel.maxSpeed) км/год 
+		"""
+		
 		let detailModel = DetailViewControllerViewModel(
 			id: fullCarModel.id,
 			image: fullCarModel.image ?? "",
 			imageData: fullCarModel.imageData,
 			title: fullCarModel.name,
 			subTitle: fullCarModel.team,
-			description: fullCarModel.description ?? ""
+			description: fullDescriptionText,
+			location: fullCarModel.location
 		)
 
 		let descriptionViewController = DescriptionCellVeloceViewController()
@@ -361,6 +374,7 @@ extension MainVeloceViewController: UICollectionViewDelegate {
 		descriptionViewController.itemID = detailModel.id
 		descriptionViewController.favoriteStatus = fullCarModel.isInFavorite
 		descriptionViewController.delegate = self
+		descriptionViewController.hidesBottomBarWhenPushed = true
 		
 		navigationController?.pushViewController(descriptionViewController, animated: true)
 	}
@@ -410,15 +424,15 @@ extension MainVeloceViewController: AddCarViewDelegate {
 	}
 }
 
-extension MainVeloceViewController: NotificationManagerDelegate {
-	func keyboardToggle(height: CGFloat, isOn: Bool) {
-		searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
-		
-		UIView.animate(withDuration: 0.3) {
-			self.view.layoutIfNeeded()
-		}
-	}
-}
+//extension MainVeloceViewController: NotificationManagerDelegate {
+//	func keyboardToggle(height: CGFloat, isOn: Bool) {
+//		searchViewBottomConstraint?.constant = isOn ? -height + self.view.safeAreaInsets.bottom : 0
+//		
+//		UIView.animate(withDuration: 0.3) {
+//			self.view.layoutIfNeeded()
+//		}
+//	}
+//}
 
 extension MainVeloceViewController: DescriptionCellVeloceViewControllerDelegate {
 	func didTapFavoriteAction(id: Int) {

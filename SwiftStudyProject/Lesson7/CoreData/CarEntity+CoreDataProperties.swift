@@ -33,6 +33,8 @@ extension CarEntity {
     @NSManaged public var team: String?
     @NSManaged public var weight: Int16
     @NSManaged public var isInFavorite: Bool
+	@NSManaged public var latitude: Double
+	@NSManaged public var longitude: Double
 
 }
 
