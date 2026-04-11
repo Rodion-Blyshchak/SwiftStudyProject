@@ -9,7 +9,7 @@ import UIKit
 import MapKit
 
 class MapKitViewController: UIViewController {
-	private var mockDataCars = CoreDataManager.shared.fetchAllCars()
+	private var mockDataCars: [CarModel] = []
 	
 	private let mapView: MKMapView = {
 		let map = MKMapView()
